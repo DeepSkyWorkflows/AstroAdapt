@@ -44,11 +44,10 @@
         /// </summary>
         /// <param name="component">The component to check.</param>
         /// <param name="other">The component to check against.</param>
-        /// <param name="targetSide">A value indicating whether the direction of the connection is towards the target or the sensor.</param>
         /// <returns>A value indicating whether the two are compatible and an array of reasons why not if they are not compatible.</returns>
         /// <exception cref="ArgumentNullException">Thrown for null argument.</exception>
         public static (bool isCompatible, string errorMessage) IsCompatibleWith(
-            this Component component, Component other, bool targetSide = false)
+            this Component component, Component other) 
         {
             if (component == null)
             {
@@ -60,13 +59,16 @@
                 return (false, "Other component cannot be null");
             }
 
-            var (type, size) = targetSide ? (component.TargetDirectionConnectionType, component.TargetDirectionConnectionSize) :
+            var (type, size) =
                 (component.SensorDirectionConnectionType, component.SensorDirectionConnectionSize);
 
-            var (otherType, otherSize) = targetSide ? (other.SensorDirectionConnectionType, other.SensorDirectionConnectionSize) :
+            var (otherType, otherSize) = 
                 (other.TargetDirectionConnectionType, other.TargetDirectionConnectionSize);
 
-            var dir = targetSide ? "target" : "sensor";
+            if (type == ConnectionTypes.Terminator || otherType == ConnectionTypes.Terminator)
+            {
+                return (false, "Can't connect to terminator.");
+            }
 
             if (!type.IsCompatibleWith(otherType))
             {
@@ -75,7 +77,7 @@
 
             if (size == ConnectionSizes.Zero)
             {
-                return (false, $"Adapter size is zero facing the {dir}.");
+                return (false, $"Adapter size is zero facing the sensor.");
             }
 
             if (otherSize == ConnectionSizes.Zero)
@@ -83,7 +85,7 @@
                 return (false, $"Other adapter has zero size.");
             }
 
-            if (size == otherSize)
+            if (size.IsCompatibleWith(otherSize))
             {
                 return (true, string.Empty);
             }
@@ -96,17 +98,16 @@
         /// </summary>
         /// <param name="src">The source <see cref="Component"/>.</param>
         /// <param name="tgt">The target <see cref="Component"/>.</param>
-        /// <param name="toTarget">A value indicating whether the connection is directed towards the target (otherwise the sensor).</param>
         /// <returns>The <see cref="Connection"/>.</returns>
-        public static Connection ConnectTo(this Component src, Component tgt, bool toTarget = false)
+        public static Connection ConnectTo(this Component src, Component tgt)
         {
-            var (isCompatible, errorMessage) = src.IsCompatibleWith(tgt, toTarget);
+            var (isCompatible, errorMessage) = src.IsCompatibleWith(tgt);
             if (isCompatible)
             {
                 return new Connection
                 {
-                    TargetDirectionComponent = toTarget ? tgt : src,
-                    SensorDirectionComponent = toTarget ? src : tgt,
+                    TargetDirectionComponent = src,
+                    SensorDirectionComponent = tgt,
                 };
             }
 
@@ -155,7 +156,8 @@
                 return newConnector;
             }
 
-            var (isCompatible, errorMessage) = connector.Connection.SensorDirectionComponent.IsCompatibleWith(target, false);
+            var (isCompatible, errorMessage) =
+                connector.Connection.SensorDirectionComponent.IsCompatibleWith(target);
 
             if (isCompatible == false)
             {
@@ -163,55 +165,79 @@
             }
 
             var connection = connector.Connection.SensorDirectionComponent
-                    .ConnectTo(target);                
+                    .ConnectTo(target);
             connector.SensorConnector = new Connector(connector, connection);
-           
+
             return connector.SensorConnector;
         }
 
         /// <summary>
-        /// Provides a set of cloned inventory sets representing every combination of
-        /// reversing components.
+        /// Gets compatible components for a target.
         /// </summary>
-        /// <param name="src">The source list of components.</param>
-        /// <returns>The inventory permutations.</returns>
-        public static Inventory[] AsInventorySets(this IEnumerable<Component> src)
+        /// <param name="src">The source <see cref="Component"/>.</param>
+        /// <param name="available">The available connections.</param>
+        /// <returns>The list of compatible adapters.</returns>
+        public static IEnumerable<Component> GetCompatibleComponents(
+            this Component src,
+            IEnumerable<Component> available)
         {
-            if (src == null)
+            if (src.SensorDirectionConnectionSize == ConnectionSizes.Zero ||
+                src.SensorDirectionConnectionType == ConnectionTypes.Terminator)
             {
-                return Array.Empty<Inventory>();
+                return Enumerable.Empty<Component>();
             }
 
-            Component[] baseSet = src.Where(s => s is not null).ToArray();
-            var results = new List<Inventory>
+            var query = available.AsQueryable();
+
+            switch (src.SensorDirectionConnectionType)
             {
-                new Inventory(baseSet)
+                case ConnectionTypes.Dual:
+                    query = query.Where(c => c.TargetDirectionConnectionType != ConnectionTypes.Terminator
+                    || (c.IsReversible && c.SensorDirectionConnectionType != ConnectionTypes.Terminator));
+                    break;
+                case ConnectionTypes.Receiver:
+                    query = query.Where(c => c.TargetDirectionConnectionType == ConnectionTypes.Inserter
+                    || (c.IsReversible && c.SensorDirectionConnectionType == ConnectionTypes.Inserter));
+                    break;
+                case ConnectionTypes.Inserter:
+                    query = query.Where(c => c.TargetDirectionConnectionType == ConnectionTypes.Receiver
+                    || (c.IsReversible && c.SensorDirectionConnectionType == ConnectionTypes.Receiver));
+                    break;
+                default:
+                    break;
+            }
+
+            return query.Where(c => src.SensorDirectionConnectionSize.IsCompatibleWith(c.TargetDirectionConnectionSize)
+            || (c.IsReversible && src.SensorDirectionConnectionSize.IsCompatibleWith(c.SensorDirectionConnectionSize)));
+        }
+
+        /// <summary>
+        /// Determine size compatibility.
+        /// </summary>
+        /// <param name="size">The size.</param>
+        /// <param name="otherSize">The size to check.</param>
+        /// <returns>A value indicating whether the sizes are compatible.</returns>
+        public static bool IsCompatibleWith(this ConnectionSizes size, ConnectionSizes otherSize)
+        {
+            if (size == ConnectionSizes.Zero || otherSize == ConnectionSizes.Zero)
+            {
+                return false;
+            }
+
+            return size switch
+            {
+                ConnectionSizes.M42With125Sleeve => otherSize == ConnectionSizes.M42With125Sleeve ||
+                                        otherSize == ConnectionSizes.M42 ||
+                                        otherSize == ConnectionSizes.OneQuarterInchSleeve,
+                ConnectionSizes.OneQuarterInchSleeve => otherSize == ConnectionSizes.OneQuarterInchSleeve ||
+otherSize == ConnectionSizes.M42With125Sleeve,
+                ConnectionSizes.M48WithTwoInchSleeve => otherSize == ConnectionSizes.M48WithTwoInchSleeve ||
+otherSize == ConnectionSizes.M48T ||
+otherSize == ConnectionSizes.TwoInchSleeve,
+                ConnectionSizes.TwoInchSleeve => otherSize == ConnectionSizes.TwoInchSleeve ||
+otherSize == ConnectionSizes.M48WithTwoInchSleeve,
+                _ => otherSize == size,
             };
-
-            if (baseSet.Any(c => c.IsReversible))
-            {
-                var permutations = 0x01 << baseSet.Count(c => c.IsReversible);
-                for (var idx = 1; idx < permutations; idx++)
-                {
-                    var targetSet = baseSet.Select(c => c.Clone()).ToArray();
-                    var flags = idx;
-                    var reversible = targetSet.Where(c => c.IsReversible).ToArray();
-                    var flagIdx = 0;
-
-                    while (flags > 0)
-                    {
-                        if ((flags & 0x01) == 0x01)
-                        {
-                            reversible[flagIdx].Reverse();
-                        }
-                        flags >>= 0x01;
-                        flagIdx++;
-                    }
-                    results.Add(new Inventory(targetSet));
-                }
-            }
-
-            return results.ToArray();
         }
     }
 }

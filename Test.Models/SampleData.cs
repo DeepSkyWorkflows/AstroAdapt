@@ -113,7 +113,7 @@ namespace Test.Models
                 (ConnectionTypes.Receiver, ConnectionTypes.Dual),
                 (ConnectionTypes.Receiver, ConnectionTypes.Inserter),
                 (ConnectionTypes.Dual, ConnectionTypes.Dual),
-            };
+            };        
 
         public static (ConnectionTypes, ConnectionTypes)[] NotMatchingTypes() =>
             new[]
@@ -130,13 +130,14 @@ namespace Test.Models
             };
 
         public static (ConnectionSizes, ConnectionSizes)[] MatchingSizes() =>
-            Enum.GetValues<ConnectionSizes>().Where(s => s != ConnectionSizes.Zero)
-            .Select(cs => (cs, cs)).ToArray();
+            Enum.GetValues<ConnectionSizes>().SelectMany(c => Enum.GetValues<ConnectionSizes>(),
+                (sz1, sz2) => (sz1, sz2)).Where(sizes => sizes.sz1.IsCompatibleWith(sizes.sz2))
+            .Select(s => (s.sz1, s.sz2))
+            .ToArray();
 
         public static (ConnectionSizes, ConnectionSizes)[] NotMatchingSizes() =>
             Enum.GetValues<ConnectionSizes>().SelectMany(cs => Enum.GetValues<ConnectionSizes>(),
-                (cs1, cs2) => (cs1, cs2)).Where(pair => pair.cs1 == ConnectionSizes.Zero ||
-                pair.cs2 == ConnectionSizes.Zero || pair.cs1 != pair.cs2).ToArray();
+                (cs1, cs2) => (cs1, cs2)).Except(MatchingSizes()).ToArray();
 
         public static IEnumerable<object[]> FullPermutationsOfComponents()
         {

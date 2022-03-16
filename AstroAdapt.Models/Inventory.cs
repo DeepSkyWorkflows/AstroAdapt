@@ -71,24 +71,25 @@ namespace AstroAdapt.Models
         /// <summary>
         /// Clones for an alternate solution.
         /// </summary>
+        /// <param name="ignore">The <see cref="Component"/> to ignore.</param>
         /// <returns>The cloned inventory.</returns>
-        public Inventory Clone()
+        public Inventory Clone(Component? ignore = null)
         {
-            var inventory = new Inventory(components);
-            foreach (var component in consumed)
+            var clone = new Inventory();
+            foreach (var component in components)
             {
-                inventory.Consume(component);
-            }
-            return inventory;
-        }
+                if (ignore != null && component.Equals(ignore))
+                {
+                    continue;
+                }
 
-        /// <summary>
-        /// Gets components available for a sensor-directed attachment.
-        /// </summary>
-        /// <param name="src">The target-side component.</param>
-        /// <returns>Any available connections.</returns>
-        public IQueryable<Component> AvailableFor(Component src) =>
-            available.Where(a => src.IsCompatibleWith(a, false).isCompatible)
-            .AsQueryable();        
+                clone.Add(component);
+                if (consumed.Contains(component))
+                {
+                    clone.Consume(component);
+                }
+            }
+            return clone;
+        }        
     }
 }

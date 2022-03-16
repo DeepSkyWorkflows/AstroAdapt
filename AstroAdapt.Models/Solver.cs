@@ -1,27 +1,14 @@
-﻿ using System;
-using System.Reflection.Metadata.Ecma335;
-
-namespace AstroAdapt.Models
+﻿namespace AstroAdapt.Models
 {
     /// <summary>
     /// Class used to solve backfocus on cameras.
     /// </summary>
-    public class Solver
+    public class Solver : ISolverInfo
     {
         private readonly Inventory inventory;
 
-        private Component Tail => Connections.Tail.Connection.TargetDirectionComponent!;
-
-        private IEnumerable<(int level, Component component)> Components()
-        {
-            var current = Connections;
-            var level = 0;
-            while (current != null)
-            {
-                yield return (level++, current.Connection.TargetDirectionComponent!);
-                current = current.SensorConnector;
-            }
-        }
+        private Component Tail => Connections.Tail.Connection.SensorDirectionComponent ??
+            Connections.Tail.Connection.TargetDirectionComponent!;
 
         /// <summary>
         /// Instantiates a new instance of the solver.
@@ -33,9 +20,9 @@ namespace AstroAdapt.Models
         {
             Target = target;
             Sensor = sensor;
+            this.inventory = inventory.Clone();
             var connection = new Connection { TargetDirectionComponent = target };
             Connections = new Connector(connection);
-            this.inventory = inventory.Clone();
         }
 
         /// <summary>
@@ -45,13 +32,12 @@ namespace AstroAdapt.Models
         /// <param name="sensorAdd">The component to add on the sensor side.</param>
         public Solver(Solver parent, Component sensorAdd)
         {
-            inventory = parent.inventory.Clone();
+            inventory = parent.inventory.Clone(sensorAdd);
             Target = parent.Target;
             Sensor = parent.Sensor;
             Connections = parent.Connections.Clone();
             Connections.Tail.ConnectTo(sensorAdd);
-            inventory.Consume(sensorAdd);
-            if (sensorAdd.Equals(Sensor))
+            if (sensorAdd.SensorDirectionConnectionType == ConnectionTypes.Terminator)
             {
                 Solved = true;
             }
@@ -78,68 +64,83 @@ namespace AstroAdapt.Models
         public bool Solved { get; private set; } = false;
 
         /// <summary>
-        /// Gets the item that is relevant to compute back focus from
+        /// Gets the number of components in the solution.
         /// </summary>
-        public Component BackFocusItem =>
-            Components()
-            .Where(c => c.component.BackFocusMm > 0)
-            .OrderByDescending(c => c.level)
-            .First().component;
+        public int SolutionSize => Connections.GetComponents().Count();
 
         /// <summary>
-        /// Computes the current length from backfocus to sensor.
+        /// Unique signature of the solution.
         /// </summary>
-        /// <returns>The length to the sensor in millimeters.</returns>
-        public double GetLengthToSensorMm()
-        {
-            var bf = BackFocusItem;
-            var level = Components().First(c => c.component.Equals(bf)).level;
-            return Components()
-                .Where(c => c.level > level && !c.component.Equals(Sensor))
-                .Sum(c => c.component.LengthMm - c.component.ThreadRecessMm);
-        }
+        public byte[] Signature => Connections.GetComponents().OrderBy(c => c.level)
+            .SelectMany(c => c.component.Signature).ToArray();
 
         /// <summary>
         /// Attempts to find a solution.
         /// </summary>
-        public void Solve(Action<Solver> register)
+        /// <param name="fork">Action to fork the solution.</param>
+        /// <param name="solved">Action to send a solution.</param>
+        /// <param name="fractionBFDeviance">Fraction of back focus to allow for error. 0 for everything.</param>
+        public void Solve(Action<Solver[]> fork, Action<Solution> solved, double fractionBFDeviance = 0.05)
         {
             if (Solved)
             {
+                var solution = new Solution
+                {
+                    Target = Target,
+                    Sensor = Sensor,
+                    Connections = Connections.GetComponents().Select(c => c.component).ToList(),
+                    BackFocusMm = Connections.SystemBackfocusMm,
+                    LengthMm = Connections.LengthMm + Target.ThreadRecessMm + Sensor.ThreadRecessMm,
+                };
+                solved(solution);
                 return;
             }
 
-            var done = false;
+            var children = new List<Solver>();
 
-            do
+            // always check for end connection first
+            if (Tail.IsCompatibleWith(Sensor).isCompatible)
             {
-                // always check for end connection first
-                var (isCompatible, _) = Tail.IsCompatibleWith(Sensor);
-                if (isCompatible)
+                children.Add(new Solver(this, Sensor));
+            }
+
+            if (fractionBFDeviance > 0)
+            {
+                var tolerance = Connections.SystemBackfocusMm * 0.05;
+                var length = Connections.LengthMm + Target.ThreadRecessMm + Sensor.ThreadRecessMm;
+                var deviance = Connections.LengthMm - Connections.SystemBackfocusMm;
+
+                if (deviance > tolerance)
                 {
-                    register(new Solver(this, Sensor));
+                    return;
+                }
+            }
+
+            var options = Tail.GetCompatibleComponents(inventory.Available)
+                .OrderByDescending(c => c.LengthMm);
+
+            foreach (var option in options)
+            {
+                if (Tail.IsCompatibleWith(option).isCompatible)
+                {
+                    children.Add(new Solver(this, option));
                 }
 
-                var options = inventory.AvailableFor(Tail).ToArray();
-
-                if (options.Length < 1)
+                if (option.IsReversible)
                 {
-                    done = true;
-                    continue;
-                }
-
-                if (options.Length > 1)
-                {
-                    foreach (var option in options[1..])
+                    var reversed = option.Clone();
+                    reversed.Reverse();
+                    if (Tail.IsCompatibleWith(reversed).isCompatible)
                     {
-                        register(new Solver(this, option));
+                        children.Add(new Solver(this, reversed));
                     }
                 }
-
-                Connections.Tail.ConnectTo(options[0]);
-                inventory.Consume(options[0]);
             }
-            while (!done);
+
+            if (children.Count > 0)
+            {
+                fork(children.ToArray());
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32127.271
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroAdapt.Models", "AstroAdapt.Models\AstroAdapt.Models.csproj", "{DEB42683-1670-479B-877B-0D3249E9207A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AstroAdapt.Models", "AstroAdapt.Models\AstroAdapt.Models.csproj", "{DEB42683-1670-479B-877B-0D3249E9207A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{6458C4BA-560B-4B3E-AADB-AB8077F53FB0}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,7 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{6458C4BA-5
 		version.json = version.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Models", "Test.Models\Test.Models.csproj", "{D91905FE-8948-425E-B929-F9A60CEF9FAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Models", "Test.Models\Test.Models.csproj", "{D91905FE-8948-425E-B929-F9A60CEF9FAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleSolver", "ExampleSolver\ExampleSolver.csproj", "{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{D91905FE-8948-425E-B929-F9A60CEF9FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D91905FE-8948-425E-B929-F9A60CEF9FAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D91905FE-8948-425E-B929-F9A60CEF9FAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

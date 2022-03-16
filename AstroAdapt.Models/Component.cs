@@ -15,7 +15,7 @@ namespace AstroAdapt.Models
         /// <summary>
         /// Gets the manufacturer of the component.
         /// </summary>
-        public Manufacturer Manufacturer { get; private set; } = new Manufacturer();
+        public Manufacturer Manufacturer { get; set; } = new Manufacturer();
 
         /// <summary>
         /// Gets or sets the name of the model.
@@ -94,6 +94,7 @@ namespace AstroAdapt.Models
         /// <returns>The cloned copy.</returns>
         public Component Clone() => new()
         {
+            Id = Id,
             BackFocusMm = BackFocusMm,
             ComponentType = ComponentType,
             InsertionPoint = InsertionPoint,
@@ -107,6 +108,20 @@ namespace AstroAdapt.Models
             TargetDirectionConnectionType = TargetDirectionConnectionType,
             ThreadRecessMm = ThreadRecessMm,
         };
+
+        /// <summary>
+        /// Gets the unique signature for a component.
+        /// </summary>
+        public byte[] Signature => Encoding.UTF8.GetBytes(
+            $"{ComponentType}{IsReversible}{InsertionPoint}{TargetDirectionConnectionSize}{TargetDirectionConnectionType}{SensorDirectionConnectionSize}{SensorDirectionConnectionType}");
+
+        /// <summary>
+        /// Are they equivalent in function?
+        /// </summary>
+        /// <param name="other">The other to compare to.</param>
+        /// <returns>A value indicating whether they are equivalent.</returns>
+        public bool IsEquivalentTo(Component other) =>
+            Signature.SequenceEqual(other.Signature);
 
         /// <summary>
         /// Equality.

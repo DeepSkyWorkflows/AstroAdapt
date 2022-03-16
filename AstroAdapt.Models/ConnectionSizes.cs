@@ -31,6 +31,11 @@
         M42,
 
         /// <summary>
+        /// M42 with sleeve
+        /// </summary>
+        M42With125Sleeve,
+
+        /// <summary>
         /// Maksutov thread
         /// </summary>
         M445,
@@ -39,6 +44,21 @@
         /// 48mm "wide" T, 2" filter
         /// </summary>
         M48T,
+
+        /// <summary>
+        /// M48 with 2" sleeve option
+        /// </summary>
+        M48WithTwoInchSleeve,
+
+        /// <summary>
+        /// 1" sleeve
+        /// </summary>
+        OneQuarterInchSleeve,
+
+        /// <summary>
+        /// 2" sleeve
+        /// </summary>
+        TwoInchSleeve,
 
         /// <summary>
         /// 2" SCT thread

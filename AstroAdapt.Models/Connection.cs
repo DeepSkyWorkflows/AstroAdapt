@@ -19,16 +19,41 @@
         /// Gets or sets the next component in the direction of the sensor or eyepiece.
         /// </summary>
         public Component? SensorDirectionComponent { get; set; } = null;
+        
+        /// <summary>
+        /// Gets the backfocus requirement.
+        /// </summary>
+        public double BackFocusMm
+        {
+            get
+            {
+                if (SensorDirectionComponent != null && SensorDirectionComponent.BackFocusMm > 0)
+                {
+                    return SensorDirectionComponent.BackFocusMm;
+                }
 
+                return TargetDirectionComponent == null ? 0 : TargetDirectionComponent.BackFocusMm;
+            }
+        }
+        
         /// <summary>
         /// Clone the connection.
         /// </summary>
         /// <returns>A new copy.</returns>
-        public Connection Clone() => new()
+        public Connection CloneIfMutable()
         {
-            SensorDirectionComponent = SensorDirectionComponent,
-            TargetDirectionComponent = TargetDirectionComponent,
-        };        
+            if (SensorDirectionComponent != null &&
+                TargetDirectionComponent != null)
+            {
+                return this;
+            }
+
+            return new()
+            {
+                SensorDirectionComponent = SensorDirectionComponent,
+                TargetDirectionComponent = TargetDirectionComponent,
+            };
+        }        
 
         /// <summary>
         /// Gets the string representation.

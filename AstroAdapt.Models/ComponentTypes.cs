@@ -16,9 +16,19 @@
         Adapter,
 
         /// <summary>
+        /// Attaches to the scope
+        /// </summary>
+        VisualBack,
+
+        /// <summary>
         /// Adds space to the image train
         /// </summary>
         Spacer,
+
+        /// <summary>
+        /// Spacer flush with sensor (usually).
+        /// </summary>
+        NosePiece,
 
         /// <summary>
         /// Manages filteres
@@ -64,6 +74,11 @@
         /// Eye piece for viewing
         /// </summary>
         Eyepiece,
+
+        /// <summary>
+        /// Allows rotation
+        /// </summary>
+        CompressionRing,
 
         /// <summary>
         /// Other component type

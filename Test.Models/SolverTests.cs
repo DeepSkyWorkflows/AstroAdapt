@@ -15,19 +15,21 @@ namespace Test.Models
         {
             var target = SampleData.GenerateTarget();
             var sensor = SampleData.GenerateSensor();
-            var inventory = new Inventory(SampleData.GenerateSpacers(20));
-            inventory.Add(SampleData.GenerateSpacer());
+            var inventory = new Inventory(new[] { SampleData.GenerateSpacer() });
             inventory.Add(SampleData.GenerateSpacer());
             inventory.Add(SampleData.GenerateSpacer());
             var solutions = new List<Solver>();
             var solver = new Solver(target, sensor, inventory);
-            Action<Solver> register = s => { };
+            Action<Solver[]> register = s => { };
             register = s =>
             {
-                solutions.Add(s);
-                s.Solve(register);
+                solutions.AddRange(s);
+                foreach(var solution in s)
+                {
+                    solution.Solve(register);
+                }
             };
-            solver.Solve(register);
+            register(new[] { solver });
             Assert.True(solutions.Any());
         }
     }
