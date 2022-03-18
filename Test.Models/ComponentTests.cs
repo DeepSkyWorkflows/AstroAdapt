@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AstroAdapt.Models;
 using Xunit;
 
@@ -168,6 +169,54 @@ namespace Test.Models
 
             // assert
             Assert.Equal(hashCode, target.GetHashCode());
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void IsEquivalentToUsesSignature(int testIdx)
+        {
+            var component = SampleData.GenerateTarget();
+            var copy = component.Clone();
+            var expected = true;
+
+            if (testIdx == 1) // show match on diff model/manu
+            {
+                copy.Manufacturer.Name = "Copy";
+                copy.Model = "Copy";
+            }
+            else if (testIdx == 2) // show non-match on diff type
+            {
+                copy.TargetDirectionConnectionSize = ConnectionSizes.Videox1in;
+                expected = false;
+            }
+
+            Assert.Equal(expected, component.IsEquivalentTo(copy));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        public void SignaturesAreUniqueForNonVanityProperties(int testIdx)
+        {
+            var component = SampleData.GenerateTarget();
+            var copy = component.Clone();
+            var expected = true;
+
+            if (testIdx == 1) // show match on diff model/manu
+            {
+                copy.Manufacturer.Name = "Copy";
+                copy.Model = "Copy";
+            }
+            else if (testIdx == 2) // show non-match on diff type
+            {
+                copy.TargetDirectionConnectionSize = ConnectionSizes.Videox1in;
+                expected = false;
+            }
+
+            Assert.Equal(expected, component.Signature.SequenceEqual(copy.Signature));
         }
     }
 }

@@ -77,7 +77,7 @@ namespace AstroAdapt.Models
         /// <summary>
         /// Reverse the orientation
         /// </summary>
-        public void Reverse()
+        public Component Reverse()
         {
             if (IsReversible)
             {
@@ -86,6 +86,8 @@ namespace AstroAdapt.Models
                     (SensorDirectionConnectionSize, SensorDirectionConnectionType);
                 (SensorDirectionConnectionSize, SensorDirectionConnectionType) = (size, type);
             }
+
+            return this;
         }
 
         /// <summary>
@@ -107,21 +109,7 @@ namespace AstroAdapt.Models
             TargetDirectionConnectionSize = TargetDirectionConnectionSize,
             TargetDirectionConnectionType = TargetDirectionConnectionType,
             ThreadRecessMm = ThreadRecessMm,
-        };
-
-        /// <summary>
-        /// Gets the unique signature for a component.
-        /// </summary>
-        public byte[] Signature => Encoding.UTF8.GetBytes(
-            $"{ComponentType}{IsReversible}{InsertionPoint}{TargetDirectionConnectionSize}{TargetDirectionConnectionType}{SensorDirectionConnectionSize}{SensorDirectionConnectionType}");
-
-        /// <summary>
-        /// Are they equivalent in function?
-        /// </summary>
-        /// <param name="other">The other to compare to.</param>
-        /// <returns>A value indicating whether they are equivalent.</returns>
-        public bool IsEquivalentTo(Component other) =>
-            Signature.SequenceEqual(other.Signature);
+        };                
 
         /// <summary>
         /// Equality.

@@ -16,9 +16,9 @@
         SolutionFound,
 
         /// <summary>
-        /// The path ended without a solution.
+        /// A single work item finished.
         /// </summary>
-        SolutionFailed,
+        SolverDone,
 
         /// <summary>
         /// All solvers have finished.

@@ -5,8 +5,6 @@
     /// </summary>
     public class Solution
     {
-        private byte[]? signature = null;
-
         /// <summary>
         /// Gets or sets the target.
         /// </summary>
@@ -38,24 +36,14 @@
         public double LengthMm { get; set; }
 
         /// <summary>
+        /// Weight for sorting purposes.
+        /// </summary>
+        public int Weight { get; set; }
+
+        /// <summary>
         /// Gets or sets the deviance from backfocus of the system.
         /// </summary>
         public double Deviance => Math.Abs(BackFocusMm - LengthMm);
-
-        /// <summary>
-        /// Gets the unique signature of the solution.
-        /// </summary>
-        public byte[] Signature
-        {
-            get
-            {
-                if (signature == null)
-                {
-                    signature = Connections.SelectMany(c => c.Signature).ToArray();
-                }
-                return signature;
-            }
-        }
 
         /// <summary>
         /// Equality of solutions.
@@ -63,13 +51,18 @@
         /// <param name="obj">The other object.</param>
         /// <returns>A value indicating whether they are equal.</returns>
         public override bool Equals(object? obj) => obj is Solution solution &&
-            Signature.SequenceEqual(solution.Signature);
+            Signature == solution.Signature;
 
         /// <summary>
         /// Gets the hash code. 
         /// </summary>
         /// <returns>The signature hash code.</returns>
         public override int GetHashCode() => Signature.GetHashCode();
+
+        /// <summary>
+        /// A unique signature for the solution.
+        /// </summary>
+        public string Signature { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets the string representation.

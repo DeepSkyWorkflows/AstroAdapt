@@ -4,6 +4,7 @@ using AstroAdapt.Models;
 
 var refreshRateMs = TimeSpan.FromMilliseconds(1000).Ticks;
 var lastTick = DateTime.Now.Ticks;
+object statusContext = new();
 
 const string FilePath = @"Data/SampleInventory.csv";
 Console.WriteLine("Example solver.");
@@ -93,7 +94,9 @@ foreach (var componentCols in componentSrc)
     var items = int.Parse(qty);
     while (items-- > 0)
     {
-        componentList.Add(component.Clone());
+        var newItem = component.Clone();
+        newItem.Id = Guid.NewGuid();
+        componentList.Add(newItem);
     }
     Console.WriteLine(component);
 }
@@ -108,7 +111,7 @@ foreach (var target in targets)
     foreach (var sensor in sensors)
     {
         Console.WriteLine($"Solving image train from {target} to {sensor}.");
-        Console.WriteLine($"s=skip,b=barlow,f=filterwheel,c=compressionring");
+        Console.WriteLine($"s=skip,b=barlow,c=compresion ring,f=filter wheel");
         Console.Write("Enter commands: ");
         var response = Console.ReadLine() ?? string.Empty;
         response = response.Trim().ToLowerInvariant();
@@ -116,88 +119,78 @@ foreach (var target in targets)
         {
             continue;
         }
-        Predicate<IEnumerable<Component>>? filter = null;
-        if (response.ToCharArray().Intersect(new[] { 'b', 'f', 'c' }).Any())
-        {
-            if (response.Contains('b'))
-            {
-                filter = inv => inv.Any(c => c.ComponentType == ComponentTypes.Barlow);
-            }
-            if (response.Contains('f'))
-            {
-                Predicate<IEnumerable<Component>> efw =
-                    inv => inv.Any(c => c.ComponentType == ComponentTypes.FilterWheel);
+        var compression = response.Contains('c');
+        var barlow = response.Contains('b');
+        var filterwheel = response.Contains('f');
+        Console.Write($"Backfocus tolerance (ENTER=0.001 or 0.1%): ");
+        var bf = Console.ReadLine() ?? string.Empty;
 
-                if (filter == null)
-                {
-                    filter = efw;
-                }
-                else
-                {
-                    filter = inv => filter(inv) && efw(inv);
-                }
-            }
-            if (response.Contains('c'))
-            {
-                Predicate<IEnumerable<Component>> ring =
-                    inv => inv.Any(c => c.ComponentType == ComponentTypes.CompressionRing);
-
-                if (filter == null)
-                {
-                    filter = ring;
-                }
-                else
-                {
-                    filter = inv => filter(inv) && ring(inv);
-                }
-            }
+        if (!double.TryParse(bf, out var backFocusTolerance))
+        { 
+            backFocusTolerance = 0.001;
         }
+
         var sd = new SolutionDomain(12);
+
         Console.Clear();
-        sd.SolutionChanged += Sd_SolutionChanged;
-        var now = DateTime.Now; 
-        await sd.SolveAsync(connectors, target, sensor, 0.05, filter);
+
+        var statTracker = new StatTracker(sd, SolutionUpdate);
+        var now = DateTime.Now;
+
+        await sd.SolveAsync(connectors, target, sensor, backFocusTolerance);
+
         var span = DateTime.Now - now;
-        Console.WriteLine($"Created {sd.ValidSolutions} in {span}.");
+
+        Console.Clear();
+        Console.WriteLine($"Finished in {span}.");
+        foreach (var type in StatTracker.AvailableResultTypes)
+        {
+            Console.WriteLine($"{type}\t\t{statTracker[type]}");
+            Console.WriteLine();
+        }
         Console.Write("Press ENTER for the solutions.");
         Console.ReadLine();
-        Console.Clear();
-        var best = sd.GetSolutions();
-        foreach (var solution in best)
+        var query = sd.GetSolutions();
+        foreach(var solution in query)
         {
+            if (barlow && !solution.Connections.Any(c => c.ComponentType == ComponentTypes.Barlow))
+            {
+                continue;
+            }
+            if (compression && !solution.Connections.Any(c => c.ComponentType == ComponentTypes.CompressionRing))
+            {
+                continue;
+            }
+            if (filterwheel && !solution.Connections.Any(c => c.ComponentType == ComponentTypes.FilterWheel))
+            {
+                continue;
+            }
             Console.WriteLine(solution.ToString());
+            Console.WriteLine();        
         }
     }
 }
 
-void Sd_SolutionChanged(object? sender, SolutionEventArgs e)
+void SolutionUpdate(StatTracker tracker)
 {
-    if (e.EventType == SolutionEventTypes.SolutionFailed &&
-        DateTime.Now.Ticks - lastTick < refreshRateMs)
+    if (DateTime.Now.Ticks - lastTick < refreshRateMs)
     {
         return;
     }
-    var wide = new string(' ', Console.BufferWidth - 1);
-    Console.SetCursorPosition(0, 0);
-    Console.WriteLine(string.Join(Environment.NewLine, new[] { wide, wide, wide, wide, wide, wide, wide }));
-    Console.SetCursorPosition(0, 0);
-    Console.WriteLine($"Event: {e.EventType}");
-    Console.WriteLine($"{e.TotalSolvers} solutions in process, {e.TotalSolutions} valid.");
-    if (e.EventType == SolutionEventTypes.SolverSpawned)
+    Monitor.Enter(statusContext);
+    try
     {
-        Console.WriteLine($"Solution size: {e.Solver?.SolutionSize}");
-    }
-    else if (e.EventType == SolutionEventTypes.SolutionFound)
-    {
-        Console.WriteLine($"{e.Solution}");
-    }
-    else if (e.EventType == SolutionEventTypes.SolvingFinished)
-    {
-        Console.WriteLine("Top 3 solved:");
-        foreach (var solution in e.Solutions!)
+        Console.SetCursorPosition(1, 1);
+        foreach (var type in StatTracker.AvailableResultTypes)
         {
-            Console.WriteLine(solution.ToString());
+            Console.Write($"{type}\t{tracker[type]}\t");
+            Console.WriteLine();
         }
+    }
+    finally
+    {
+        Monitor.Exit(statusContext);
     }
     lastTick = DateTime.Now.Ticks;
 }
+

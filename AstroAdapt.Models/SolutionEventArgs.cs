@@ -10,20 +10,17 @@
         /// </summary>
         /// <param name="sd">The solution domain raising the event.</param>
         /// <param name="eventType">The event type.</param>
-        public SolutionEventArgs(SolutionDomain sd, SolutionEventTypes eventType)
+        /// <param name="solverResult">The solver result.</param>
+        public SolutionEventArgs(
+            SolutionDomain sd,
+            SolutionEventTypes eventType,
+            SolverResults solverResult = SolverResults.Info)
         {
             TotalSolvers = sd.NumberSolutions;
             TotalSolutions = sd.ValidSolutions;
             EventType = eventType;
+            SolverResult = solverResult;
         }
-
-        /// <summary>
-        /// Creates a new instance of the <see cref="SolutionEventArgs"/> class.
-        /// </summary>
-        /// <param name="sd">The solution domain raising the event.</param>
-        /// <param name="solver">The <see cref="Solver"/> that spawned.</param>
-        public SolutionEventArgs(SolutionDomain sd, Solver solver) :
-            this(sd, SolutionEventTypes.SolverSpawned) => payload = solver;
 
         /// <summary>
         /// Creates a new instance of the <see cref="SolutionEventArgs"/> class.
@@ -31,7 +28,11 @@
         /// <param name="sd">The solution domain raising the event.</param>
         /// <param name="solution">The <see cref="Solution"/> that was created.</param>
         public SolutionEventArgs(SolutionDomain sd, Solution solution) :
-            this(sd, SolutionEventTypes.SolutionFound) => payload = solution;
+            this(sd, SolutionEventTypes.SolutionFound)
+        {
+            payload = solution;
+            SolverResult = SolverResults.Solved;
+        }
 
         /// <summary>
         /// Creates a new instance of the <see cref="SolutionEventArgs"/> class.
@@ -62,9 +63,9 @@
         private readonly object? payload;
 
         /// <summary>
-        /// Gets or sets the <see cref="Solver"/> that spawned.
+        /// Reason to trigger the update.
         /// </summary>
-        public ISolverInfo? Solver => payload as ISolverInfo;
+        public SolverResults SolverResult { get; private set; } = SolverResults.Info;
 
         /// <summary>
         /// Gets the solution.

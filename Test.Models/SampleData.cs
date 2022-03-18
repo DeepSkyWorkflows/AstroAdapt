@@ -38,12 +38,7 @@ namespace Test.Models
             LengthMm = 11,
             Model = "Spacer"
         };
-
-        public static Connection GenerateConnection(
-            Component? target = null,
-            Component? sensor = null) =>
-            (target ?? GenerateTarget()).ConnectTo(sensor ?? GenerateSensor());
-
+        
         public static Component[] GenerateSpacers(int count = 10)
         {
             var result = new Component[count];

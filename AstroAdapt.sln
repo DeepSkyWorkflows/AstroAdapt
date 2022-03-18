@@ -21,7 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{6458C4BA-5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test.Models", "Test.Models\Test.Models.csproj", "{D91905FE-8948-425E-B929-F9A60CEF9FAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleSolver", "ExampleSolver\ExampleSolver.csproj", "{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleSolver", "ExampleSolver\ExampleSolver.csproj", "{92E04CE3-B07E-4947-BE29-B5CEFB3ABF32}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F93EE0F-3C86-4D5A-9A38-5AE723807462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

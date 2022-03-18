@@ -15,7 +15,7 @@ namespace Test.Models
         {
             var target = SampleData.GenerateTarget();
             var sensor = SampleData.GenerateSensor();
-            var inventory = new Inventory(new[] { SampleData.GenerateSpacer() });
+            var inventory = new Inventory(new[] { SampleData.GenerateSpacer() }, sensor);
             inventory.Add(SampleData.GenerateSpacer());
             inventory.Add(SampleData.GenerateSpacer());
             var solutions = new List<Solver>();
@@ -26,7 +26,7 @@ namespace Test.Models
                 solutions.AddRange(s);
                 foreach(var solution in s)
                 {
-                    solution.Solve(register);
+                    solution.Solve(register, sol=>true);
                 }
             };
             register(new[] { solver });
