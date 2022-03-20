@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AstroAdapt.Data", "AstroAda
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroAdapt.Engine", "AstroAdapt.Engine\AstroAdapt.Engine.csproj", "{446C5E86-1766-452D-8A48-6C6B4353F13C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroAdapt.GraphQL", "AstroAdapt.GraphQL\AstroAdapt.GraphQL.csproj", "{27250EE3-28CF-4A3F-834C-ABCE06D1D125}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{446C5E86-1766-452D-8A48-6C6B4353F13C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{446C5E86-1766-452D-8A48-6C6B4353F13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{446C5E86-1766-452D-8A48-6C6B4353F13C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27250EE3-28CF-4A3F-834C-ABCE06D1D125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27250EE3-28CF-4A3F-834C-ABCE06D1D125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27250EE3-28CF-4A3F-834C-ABCE06D1D125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27250EE3-28CF-4A3F-834C-ABCE06D1D125}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

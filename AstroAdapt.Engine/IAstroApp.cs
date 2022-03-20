@@ -47,7 +47,7 @@ namespace AstroAdapt.Engine
         /// </summary>
         /// <param name="items">List of ids to resolve.</param>
         /// <returns>The image data.</returns>
-        Task<IEnumerable<ImageData>> GetImagesForItems(IEnumerable<(Guid id, ComponentTypes type)> items);
+        Task<IEnumerable<ImageData>> GetImagesForItemsAsync(IEnumerable<(Guid id, ComponentTypes type)> items);
 
         /// <summary>
         /// Sets the default image for a type.

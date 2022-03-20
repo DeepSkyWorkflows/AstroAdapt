@@ -7,14 +7,7 @@ namespace AstroAdapt.Data
     /// Data access for the astro adapter.
     /// </summary>
     public class AstroContext : DbContext
-    {
-        /// <summary>
-        /// Creates a new instance of the <see cref="AstroContext"/>.
-        /// </summary>
-        public AstroContext()
-        {
-        }
-
+    {        
         /// <summary>
         /// Creates a new instance of the <see cref="AstroContext"/>.
         /// </summary>

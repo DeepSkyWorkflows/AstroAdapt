@@ -13,6 +13,10 @@
     <ProjectReference Include="..\AstroAdapt.Models\AstroAdapt.Models.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.3"/>
+    </ItemGroup>
+
   <ItemGroup>
     <None Update="Data\SampleInventory.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

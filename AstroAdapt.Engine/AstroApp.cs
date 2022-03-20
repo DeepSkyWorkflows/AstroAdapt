@@ -9,6 +9,17 @@ namespace AstroAdapt.Engine
     /// </summary>
     public class AstroApp : IAstroApp
     {
+        /// <summary>
+        /// Initialize instance with defaults.
+        /// </summary>
+        public AstroApp()
+        {
+            var rootPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            rootPath = Path.Combine(rootPath, "astro-app");
+            PathToImages = Path.Combine(rootPath, @"astro-app-images");
+            PathToDatabase = Path.Combine(rootPath, @"data\astroapp.sqlite");
+        }
+
         private IDbContextFactory<AstroContext>? dbContextFactory = null;
 
         /// <summary>
@@ -40,7 +51,7 @@ namespace AstroAdapt.Engine
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ImageData>> GetImagesForItems(
+        public async Task<IEnumerable<ImageData>> GetImagesForItemsAsync(
             IEnumerable<(Guid id, ComponentTypes type)> items)
         {
             var result = new List<ImageData>();
