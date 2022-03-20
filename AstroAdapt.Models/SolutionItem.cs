@@ -1,26 +1,64 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AstroAdapt.Models
 {
     /// <summary>
-    /// An actual component
+    /// An item in a solution list.
     /// </summary>
-    public class Component
+    public class SolutionItem
     {
         /// <summary>
-        /// Gets or sets the unique id of the component.
+        /// Creates a new instance.
+        /// </summary>
+        public SolutionItem()
+        {
+        }
+
+        /// <summary>
+        /// Creates a new instance from a component. 
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="sequence"></param>
+        public SolutionItem(Component component, int sequence)
+        {
+            ComponentId = component.Id;
+            ItemName = $"{component.Manufacturer.Name} {component.Model}";
+            BackFocusMm = component.BackFocusMm;
+            LengthMm = component.LengthMm;
+            ThreadRecessMm = component.ThreadRecessMm;
+            ComponentType = component.ComponentType;
+            TargetDirectionConnectionType = component.TargetDirectionConnectionType;
+            TargetDirectionConnectionSize = component.TargetDirectionConnectionSize;
+            SensorDirectionConnectionType = component.SensorDirectionConnectionType;
+            SensorDirectionConnectionSize = component.SensorDirectionConnectionSize;
+            ShortCode = component.ShortCode;
+            Sequence = sequence;
+        }
+
+        /// <summary>
+        /// Gets or sets the unique id of the item.
         /// </summary>
         public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
-        /// Gets the manufacturer of the component.
+        /// Order in the soluion.
         /// </summary>
-        public Manufacturer Manufacturer { get; set; } = new Manufacturer();
+        public int Sequence { get; set; }
 
         /// <summary>
-        /// Gets or sets the name of the model.
+        /// Gets or sets the guid of the related component.
         /// </summary>
-        public string Model { get; set; } = "Generic";
+        public Guid ComponentId { get; set; } = Guid.NewGuid();
+
+        /// <summary>
+        /// Gets the manufacturer and model of the component.
+        /// </summary>
+        public string ItemName { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the distance the thread is recessed in millimeters. This can automatically
@@ -65,70 +103,9 @@ namespace AstroAdapt.Models
         public ConnectionSizes SensorDirectionConnectionSize { get; set; } = ConnectionSizes.Zero;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the directions of the component can be reversed.
-        /// </summary>
-        public bool IsReversible { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets the preferred insertion point.
-        /// </summary>
-        public InsertionPoints InsertionPoint { get; set; } = InsertionPoints.NoPreference;
-
-        /// <summary>
         /// Code for report printing.
         /// </summary>
         public string ShortCode { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Reverse the orientation
-        /// </summary>
-        public Component Reverse()
-        {
-            if (IsReversible)
-            {
-                var (size, type) = (TargetDirectionConnectionSize, TargetDirectionConnectionType);
-                (TargetDirectionConnectionSize, TargetDirectionConnectionType) =
-                    (SensorDirectionConnectionSize, SensorDirectionConnectionType);
-                (SensorDirectionConnectionSize, SensorDirectionConnectionType) = (size, type);
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Creates a copy.
-        /// </summary>
-        /// <returns>The cloned copy.</returns>
-        public Component Clone() => new()
-        {
-            Id = Id,
-            ShortCode = ShortCode,            
-            BackFocusMm = BackFocusMm,
-            ComponentType = ComponentType,
-            InsertionPoint = InsertionPoint,
-            LengthMm = LengthMm,
-            Manufacturer = Manufacturer,
-            Model = Model,
-            IsReversible = IsReversible,
-            SensorDirectionConnectionSize = SensorDirectionConnectionSize,
-            SensorDirectionConnectionType = SensorDirectionConnectionType,
-            TargetDirectionConnectionSize = TargetDirectionConnectionSize,
-            TargetDirectionConnectionType = TargetDirectionConnectionType,
-            ThreadRecessMm = ThreadRecessMm,
-        };                
-
-        /// <summary>
-        /// Equality.
-        /// </summary>
-        /// <param name="obj">The object to compare.</param>
-        /// <returns>A value that is true when the other object is a <see cref="Component"/> with the same id.</returns>
-        public override bool Equals(object? obj) => obj is Component other && Id == other.Id;
-
-        /// <summary>
-        /// Gets the hash code of the id.
-        /// </summary>
-        /// <returns>The hash code of the id.</returns>
-        public override int GetHashCode() => Id.GetHashCode();
 
         /// <summary>
         /// Gets a string representation of the component.
@@ -138,8 +115,7 @@ namespace AstroAdapt.Models
         {
             var sb = new StringBuilder();
             sb.Append($"{TargetDirectionConnectionType.AsVisualString(true)} {TargetDirectionConnectionSize} (");
-            sb.Append(Manufacturer?.Name ?? string.Empty);
-            sb.Append($" {Model} ");
+            sb.Append(ItemName);
             if (ThreadRecessMm > 0)
             {
                 sb.Append($"thr={ThreadRecessMm}mm ");
@@ -154,5 +130,6 @@ namespace AstroAdapt.Models
             sb.Append($"{SensorDirectionConnectionSize}{SensorDirectionConnectionType.AsVisualString(false)}");
             return sb.ToString();
         }
+
     }
 }

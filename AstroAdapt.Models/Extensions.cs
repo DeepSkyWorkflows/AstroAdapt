@@ -118,12 +118,17 @@
                     || (c.IsReversible && c.SensorDirectionConnectionType != ConnectionTypes.Terminator));
                     break;
                 case ConnectionTypes.Receiver:
-                    query = query.Where(c => c.TargetDirectionConnectionType == ConnectionTypes.Inserter
-                    || (c.IsReversible && c.SensorDirectionConnectionType == ConnectionTypes.Inserter));
+                    query = query.Where(c =>
+                        c.TargetDirectionConnectionType == ConnectionTypes.Inserter ||
+                        c.TargetDirectionConnectionType == ConnectionTypes.Dual
+                    || (c.IsReversible && (c.SensorDirectionConnectionType == ConnectionTypes.Inserter ||
+                        c.SensorDirectionConnectionType == ConnectionTypes.Dual)));
                     break;
                 case ConnectionTypes.Inserter:
-                    query = query.Where(c => c.TargetDirectionConnectionType == ConnectionTypes.Receiver
-                    || (c.IsReversible && c.SensorDirectionConnectionType == ConnectionTypes.Receiver));
+                    query = query.Where(c => c.TargetDirectionConnectionType == ConnectionTypes.Receiver ||
+                    c.TargetDirectionConnectionType == ConnectionTypes.Dual
+                    || (c.IsReversible && (c.SensorDirectionConnectionType == ConnectionTypes.Receiver ||
+                    c.SensorDirectionConnectionType == ConnectionTypes.Dual)));
                     break;
                 default:
                     break;
@@ -160,6 +165,24 @@ otherSize == ConnectionSizes.TwoInchSleeve,
 otherSize == ConnectionSizes.M48WithTwoInchSleeve,
                 _ => otherSize == size,
             };
+        }
+
+        /// <summary>
+        /// Convert solution to saved solution.
+        /// </summary>
+        /// <param name="solution">The <see cref="Solution"/> to convert.</param>
+        /// <returns>The <see cref="SavedSolution"/>.</returns>
+        public static SavedSolution ToSavedSolution(this Solution solution)
+        {
+            var result = new SavedSolution();
+            result.Target = new SolutionItem(solution.Target, 0);
+            result.Name = $"{solution.Target} to {solution.Sensor}";
+            result.Sensor = new SolutionItem(solution.Sensor, 0);
+            for (var idx = 0; idx < solution.ComponentCount; idx++)
+            {
+                result.Items.Add(new SolutionItem(solution.Connections[idx], idx));
+            }
+            return result;
         }
     }
 }

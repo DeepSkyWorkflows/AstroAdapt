@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AstroAdapt.Data\AstroAdapt.Data.csproj" />
+    <ProjectReference Include="..\AstroAdapt.Engine\AstroAdapt.Engine.csproj" />
     <ProjectReference Include="..\AstroAdapt.Models\AstroAdapt.Models.csproj" />
   </ItemGroup>
 

@@ -120,103 +120,16 @@ namespace Test.Models
         }
 
         [Fact]
-        public void ConnectToThrowsWhenNotCompatible()
-        {
-            var src = new Component
-            {
-                SensorDirectionConnectionType = ConnectionTypes.Receiver,
-                SensorDirectionConnectionSize = ConnectionSizes.M12,
-            };
-
-            var tgt = new Component
-            {
-                TargetDirectionConnectionType = ConnectionTypes.Receiver,
-                TargetDirectionConnectionSize = ConnectionSizes.M12,
-            };
-
-            Assert.Throws<InvalidOperationException>(() => src.ConnectTo(tgt));
-        }
-
-        [Fact]
-        public void ConnectToReturnsConnectionWhenCompatible()
-        {
-            var src = new Component
-            {
-                SensorDirectionConnectionType = ConnectionTypes.Receiver,
-                SensorDirectionConnectionSize = ConnectionSizes.M12,
-            };
-
-            var tgt = new Component
-            {
-                TargetDirectionConnectionType = ConnectionTypes.Inserter,
-                TargetDirectionConnectionSize = ConnectionSizes.M12,
-            };
-
-            var result = src.ConnectTo(tgt);
-            Assert.NotNull(result);
-            Assert.Same(result.TargetDirectionComponent, src);
-            Assert.Same(result.SensorDirectionComponent, tgt);
-        }
-
-        [Fact]
         public void HashCodeIsHashCodeOfId()
         {
             // arrange
             var target = new Component();
 
             // act
-            var hashCode = target.GetHashCode();
+            var hashCode = target.Id.GetHashCode();
 
             // assert
             Assert.Equal(hashCode, target.GetHashCode());
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(2)]
-        public void IsEquivalentToUsesSignature(int testIdx)
-        {
-            var component = SampleData.GenerateTarget();
-            var copy = component.Clone();
-            var expected = true;
-
-            if (testIdx == 1) // show match on diff model/manu
-            {
-                copy.Manufacturer.Name = "Copy";
-                copy.Model = "Copy";
-            }
-            else if (testIdx == 2) // show non-match on diff type
-            {
-                copy.TargetDirectionConnectionSize = ConnectionSizes.Videox1in;
-                expected = false;
-            }
-
-            Assert.Equal(expected, component.IsEquivalentTo(copy));
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(2)]
-        public void SignaturesAreUniqueForNonVanityProperties(int testIdx)
-        {
-            var component = SampleData.GenerateTarget();
-            var copy = component.Clone();
-            var expected = true;
-
-            if (testIdx == 1) // show match on diff model/manu
-            {
-                copy.Manufacturer.Name = "Copy";
-                copy.Model = "Copy";
-            }
-            else if (testIdx == 2) // show non-match on diff type
-            {
-                copy.TargetDirectionConnectionSize = ConnectionSizes.Videox1in;
-                expected = false;
-            }
-
-            Assert.Equal(expected, component.Signature.SequenceEqual(copy.Signature));
         }
     }
 }

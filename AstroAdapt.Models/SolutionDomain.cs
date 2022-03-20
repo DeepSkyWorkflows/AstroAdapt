@@ -129,7 +129,7 @@ namespace AstroAdapt.Models
                     SolutionEventTypes.SolverDone,
                     result));
 
-            if (workerCount < 2)
+            if (workerCount < 1)
             {
                 Worker();
             }
@@ -181,6 +181,7 @@ namespace AstroAdapt.Models
             {
                 flags[bytePos] = currentByte;
             }
+
             return flags;
         }
 
@@ -189,11 +190,13 @@ namespace AstroAdapt.Models
         /// </summary>
         /// <param name="components">The list of available components.</param>
         /// <param name="component">The component to test.</param>
+        /// <param name="reversed">The call is for a reversed parent.</param>
         /// <returns>The dependencies.</returns>
         /// <remarks>Simple bit map shows true for compatible items and false for incompatible.</remarks>
         private byte[] GetDependencies(
             IEnumerable<Component> components,
-            Component component)
+            Component component,
+            bool reversed = false)
         {
             var totalBytes = ((components.Count() - 1) >> 3) + 1;
             var deps = new byte[totalBytes];
@@ -231,6 +234,15 @@ namespace AstroAdapt.Models
                     {
                         deps[byteMap[option.Id]] |= bitMap[option.Id];
                     }
+                }
+            }
+
+            if (!reversed && component.IsReversible)
+            {
+                var reversedDeps = GetDependencies(components, component.Clone().Reverse(), true);
+                for (var idx = 0; idx < deps.Length; idx++)
+                {
+                    deps[idx] |= reversedDeps[idx];
                 }
             }
 
@@ -278,6 +290,9 @@ namespace AstroAdapt.Models
 
             // this is the edge node we are considering
             (Guid rootId, bool reversed) = imageTrain[^1];
+            var newComponent = reversed ? 
+                components[rootId].Clone().Reverse() :
+                components[rootId];
 
             // remove from inventory
             flags[byteMap[rootId]] &= (byte)(MASK ^ bitMap[rootId]);
@@ -301,7 +316,7 @@ namespace AstroAdapt.Models
             }
 
             // always check for end connection first
-            if (components[rootId].IsCompatibleWith(Sensor).isCompatible)
+            if (newComponent.IsCompatibleWith(Sensor).isCompatible)
             {
                 Spawn(new SolverJob(
                     flags.ToArray(), imageTrain.Union(new[] { (Sensor.Id, false) }).ToArray()));
@@ -335,7 +350,7 @@ namespace AstroAdapt.Models
                 if (depResolver[0])
                 {
                     var option = components[keys[cidx]];
-                    if (components[rootId].IsCompatibleWith(option).isCompatible)
+                    if (newComponent.IsCompatibleWith(option).isCompatible)
                     {
                         Spawn(new SolverJob(
                             flags.ToArray(),
@@ -345,9 +360,8 @@ namespace AstroAdapt.Models
                     // some components can be flipped and work just fine
                     if (option.IsReversible)
                     {
-                        var reversedOption = option.Clone();
-                        reversedOption.Reverse();
-                        if (components[rootId].IsCompatibleWith(reversedOption).isCompatible)
+                        var reversedOption = option.Clone().Reverse();
+                        if (newComponent.IsCompatibleWith(reversedOption).isCompatible)
                         {
                             Spawn(new SolverJob(
                             flags.ToArray(),
@@ -407,7 +421,7 @@ namespace AstroAdapt.Models
         private SolverResults Solved(Solution solution)
         {
             var tolerance = solution.BackFocusMm * BackFocusTolerance;
-            if (solution.Deviance <= tolerance)
+            if (solution.Deviance <= tolerance || BackFocusTolerance == 0)
             {
                 solution.Weight = ComputeWeight(solution);
                 solution.Signature = ComputeSignature(solution);
