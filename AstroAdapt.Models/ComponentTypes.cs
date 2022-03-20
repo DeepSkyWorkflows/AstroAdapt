@@ -31,7 +31,7 @@
         NosePiece,
 
         /// <summary>
-        /// Manages filteres
+        /// Manages filters
         /// </summary>
         FilterWheel,
 

@@ -29,6 +29,70 @@ namespace AstroAdapt.Engine
             Func<IQueryable<Component>, IQueryable<Component>>? query = null);
 
         /// <summary>
+        /// Add a new item to inventory.
+        /// </summary>
+        /// <param name="newComponent">The new component.</param>
+        /// <returns>The saved component.</returns>
+        Task<Component> AddInventoryItemAsync(Component newComponent);
+
+        /// <summary>
+        /// Deletes an item from inventory.
+        /// </summary>
+        /// <param name="id">The id to delete.</param>
+        /// <returns>The task.</returns>
+        Task DeleteInventoryItemAsync(Guid id);
+
+        /// <summary>
+        /// Gets the related image info for the requested items.
+        /// </summary>
+        /// <param name="items">List of ids to resolve.</param>
+        /// <returns>The image data.</returns>
+        Task<IEnumerable<ImageData>> GetImagesForItems(IEnumerable<(Guid id, ComponentTypes type)> items);
+
+        /// <summary>
+        /// Sets the default image for a type.
+        /// </summary>
+        /// <param name="type">The type the default is for.</param>
+        /// <param name="data">The image contents.</param>
+        /// <returns>A task.</returns>
+        Task SetDefaultImageAsync(ComponentTypes type, byte[] data);
+
+        /// <summary>
+        /// Sets the image for specific component.
+        /// </summary>
+        /// <param name="id">The id of the component the image is for.</param>
+        /// <param name="filename">The filename.</param>
+        /// <param name="data">The image contents.</param>
+        /// <returns>A task.</returns>
+        Task SetImageAsync(Guid id, string filename, byte[] data);
+
+
+        /// <summary>
+        /// Query for solutions.
+        /// </summary>
+        /// <param name="query">The query.</param>
+        /// <returns>The solution list.</returns>
+        Task<IEnumerable<SavedSolution>> LoadSolutionsAsync(
+            Func<IQueryable<SavedSolution>, IQueryable<SavedSolution>>? query = null);
+
+        /// <summary>
+        /// Load a single solution.
+        /// </summary>
+        /// <param name="id">The solution id.</param>
+        /// <returns>The solution.</returns>
+        Task<SavedSolution?> LoadSolutionAsync(Guid id);
+
+        /// <summary>
+        /// Captures a snapshot of a solution and saves it.
+        /// </summary>
+        /// <param name="solution">The solution to save.</param>
+        /// <param name="description">Description of the solution.</param>
+        /// <returns>The <see cref="SavedSolution"/>.</returns>
+        Task<SavedSolution> SaveSolutionAsync(
+            Solution solution,
+            string? description = null);
+
+        /// <summary>
         /// Requests a solution.
         /// </summary>
         /// <param name="target">The target lens to solve.</param>

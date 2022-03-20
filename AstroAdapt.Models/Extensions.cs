@@ -174,10 +174,12 @@ otherSize == ConnectionSizes.M48WithTwoInchSleeve,
         /// <returns>The <see cref="SavedSolution"/>.</returns>
         public static SavedSolution ToSavedSolution(this Solution solution)
         {
-            var result = new SavedSolution();
-            result.Target = new SolutionItem(solution.Target, 0);
-            result.Name = $"{solution.Target} to {solution.Sensor}";
-            result.Sensor = new SolutionItem(solution.Sensor, 0);
+            var result = new SavedSolution
+            {
+                Target = new SolutionItem(solution.Target, 0),
+                Name = $"{solution.Target} to {solution.Sensor}",
+                Sensor = new SolutionItem(solution.Sensor, 0)
+            };
             for (var idx = 0; idx < solution.ComponentCount; idx++)
             {
                 result.Items.Add(new SolutionItem(solution.Connections[idx], idx));

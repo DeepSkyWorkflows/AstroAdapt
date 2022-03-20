@@ -22,6 +22,45 @@ namespace AstroAdapt.Engine
         public string PathToDatabase { get; private set; } = string.Empty;
 
         /// <inheritdoc/>
+        public async Task<Component> AddInventoryItemAsync(Component newComponent)
+        {
+            using var ctx = GetContext();
+            ctx.Components.Add(newComponent);
+            await ctx.SaveChangesAsync();
+            return newComponent;
+        }
+
+        /// <inheritdoc/>
+        public async Task DeleteInventoryItemAsync(Guid id)
+        {
+            using var ctx = GetContext();
+            var componentToDelete = await ctx.Components.SingleAsync(c => c.Id == id);
+            ctx.Components.Remove(componentToDelete);
+            await ctx.SaveChangesAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ImageData>> GetImagesForItems(
+            IEnumerable<(Guid id, ComponentTypes type)> items)
+        {
+            var result = new List<ImageData>();
+            var files = Directory.EnumerateFiles(PathToImages).ToList();
+            foreach(var (id, type) in items)
+            {
+                var file = files.FirstOrDefault(f => f.Contains(id.ToString())) ??
+                    Path.Combine(PathToImages, $"{type}.png");
+                var image = new ImageData
+                {
+                    Id = id,
+                    FileName = Path.GetFileName(file),
+                    Image = await File.ReadAllBytesAsync(file)
+                };
+                result.Add(image);            
+            }
+            return result;
+        }
+
+        /// <inheritdoc/>
         public async Task InitializeAsync(
             Func<string, IDbContextFactory<AstroContext>> resolveFactory,
             string? rootPath = null,
@@ -36,6 +75,12 @@ namespace AstroAdapt.Engine
             if (!Directory.Exists(PathToImages))
             {
                 Directory.CreateDirectory(PathToImages);
+                foreach (var componentType in Enum.GetValues<ComponentTypes>())
+                {
+                    var src = $"DefaultImages/{componentType}.png";
+                    var tgt = Path.Combine(PathToImages, $"{componentType.ToString().ToLowerInvariant()}.png");
+                    File.Copy(src, tgt, true);
+                }
             }
 
             if (!Directory.Exists(Path.GetDirectoryName(PathToDatabase)))
@@ -62,16 +107,62 @@ namespace AstroAdapt.Engine
         public async Task<IEnumerable<Component>> LoadInventoryAsync(
             Func<IQueryable<Component>, IQueryable<Component>>? query = null)
         {
-            if (dbContextFactory == null)
-            {
-                throw new InvalidOperationException("InitializeAsync() must be called first!");
-            }
-            using var ctx = dbContextFactory.CreateDbContext();
+            using var ctx = GetContext();
             if (query == null)
             {
                 return await ctx.Components.ToListAsync();
             }
             return await query(ctx.Components).ToListAsync();
+        }        
+
+        /// <inheritdoc/>
+        public async Task<SavedSolution?> LoadSolutionAsync(Guid id)
+        {
+            using var ctx = GetContext();
+            return await ctx.Solutions.Where(s => s.Id == id)
+                .Include(s => s.Sensor)
+                .Include(s => s.Target)
+                .Include(s => s.Items)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<SavedSolution>> LoadSolutionsAsync(
+            Func<IQueryable<SavedSolution>,
+                IQueryable<SavedSolution>>? query = null)
+        {
+            using var ctx = GetContext();
+            if (query == null)
+            {
+                return await ctx.Solutions.ToListAsync();
+            }
+            return await query(ctx.Solutions).ToListAsync();
+        }
+
+        /// <inheritdoc/>
+        public async Task<SavedSolution> SaveSolutionAsync(Solution solution, string? description = null)
+        {
+            var savedSolution = solution.ToSavedSolution();
+            savedSolution.Description = description ?? string.Empty;
+            using var ctx = GetContext();
+            ctx.Solutions.Add(savedSolution);
+            await ctx.SaveChangesAsync();
+            return savedSolution;
+        }
+
+        /// <inheritdoc/>
+        public async Task SetDefaultImageAsync(ComponentTypes type, byte[] data)
+        {
+            var file = Path.Combine(PathToImages, $"{type}.png");
+            await File.WriteAllBytesAsync(file, data);
+        }
+
+        /// <inheritdoc/>
+        public async Task SetImageAsync(Guid id, string filename, byte[] data)
+        {
+            var ext = Path.GetExtension(filename);
+            var targetFile = Path.Combine(PathToImages, $"{id}{ext}");
+            await File.WriteAllBytesAsync(targetFile, data);
         }
 
         /// <inheritdoc/>
@@ -121,9 +212,14 @@ namespace AstroAdapt.Engine
             return sd.GetSolutions();
         }
 
-        private void Sd_SolutionChanged(object? sender, SolutionEventArgs e)
+        private AstroContext GetContext()
         {
-            throw new NotImplementedException();
+            if (dbContextFactory == null)
+            {
+                throw new InvalidOperationException("AstroApp not initialized. Call InitializeAsync() first.");
+            }
+
+            return dbContextFactory.CreateDbContext();
         }
     }
 }
