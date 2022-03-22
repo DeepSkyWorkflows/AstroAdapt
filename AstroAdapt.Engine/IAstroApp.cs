@@ -36,6 +36,13 @@ namespace AstroAdapt.Engine
         Task<Component> AddInventoryItemAsync(Component newComponent);
 
         /// <summary>
+        /// Update a component.
+        /// </summary>
+        /// <param name="componentToUpdate">The component to update.</param>
+        /// <returns>The updated component.</returns>
+        Task<Component> UpdateInventoryItemAsync(Component componentToUpdate);
+
+        /// <summary>
         /// Deletes an item from inventory.
         /// </summary>
         /// <param name="id">The id to delete.</param>
@@ -66,7 +73,6 @@ namespace AstroAdapt.Engine
         /// <returns>A task.</returns>
         Task SetImageAsync(Guid id, string filename, byte[] data);
 
-
         /// <summary>
         /// Query for solutions.
         /// </summary>
@@ -81,6 +87,13 @@ namespace AstroAdapt.Engine
         /// <param name="id">The solution id.</param>
         /// <returns>The solution.</returns>
         Task<SavedSolution?> LoadSolutionAsync(Guid id);
+
+        /// <summary>
+        /// Delete a single solution.
+        /// </summary>
+        /// <param name="id">The solution id.</param>
+        /// <returns>The task.</returns>
+        Task DeleteSolutionAsync(Guid id);
 
         /// <summary>
         /// Captures a snapshot of a solution and saves it.

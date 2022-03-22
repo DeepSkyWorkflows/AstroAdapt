@@ -21,12 +21,16 @@ namespace AstroAdapt.GraphQL
         [SubscribeAndResolve]
         public ValueTask<ISourceStream<FinalSolution>> ProblemSolved(
             string correlationId,
-            [Service]ITopicEventReceiver receiver,
-            [Service]SolutionProcessingService service)
+            [Service] ITopicEventReceiver receiver,
+            [Service] SolutionProcessingService service)
         {
             var topic = $"{correlationId}_{nameof(FinalSolution)}";
             var sub = receiver.SubscribeAsync<string, FinalSolution>(topic);
-            service.ActivateTaskAsync(long.Parse(correlationId)).ConfigureAwait(false);
+            Task.Run(() =>
+            { 
+                Thread.Sleep(500);
+                service.ActivateTaskAsync(long.Parse(correlationId)).ConfigureAwait(false);
+            });
             return sub;
         }
 

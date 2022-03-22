@@ -79,7 +79,20 @@ namespace AstroAdapt.GraphQL
                 nameof(ConnectionTypes) => Enum.GetNames(typeof(ConnectionTypes)),
                 nameof(ConnectionSizes) => Enum.GetNames(typeof(ConnectionSizes)),
                 _ => Array.Empty<string>(),
-            };        
+            };
+
+        /// <summary>
+        /// Gets all saved solutions.
+        /// </summary>
+        /// <param name="factory">The DbContext factory.</param>
+        /// <returns>The list of solutions.</returns>
+        [UseProjection]
+        [UseFiltering]
+        [UseSorting]
+        public IQueryable<SavedSolution> GetSavedSolutions(
+            [Service] IDbContextFactory<AstroContext> factory)
+            => factory.CreateDbContext().Solutions;
+
     }
 }
 

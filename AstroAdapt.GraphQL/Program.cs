@@ -1,6 +1,7 @@
 ﻿using AstroAdapt.Data;
 using AstroAdapt.Engine;
 using AstroAdapt.GraphQL;
+using AstroAdapt.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,11 +20,11 @@ builder.Services.AddGraphQLServer()
     .AddFiltering()
     .AddSorting()
     .AddQueryType<Query>()
-   //  .AddMutationType<Mutations>()
-   //.AddTypeExtension<ObservationTypeExtensions>()
+    .AddType<SolutionInputType>()
+    .AddMutationType<Mutation>()
+    .AddTypeExtension<ComponentExtensions>()
     .AddSubscriptionType<Subscription>()
-    .AddInMemorySubscriptions()
-   ;
+    .AddInMemorySubscriptions();
 
 var app = builder.Build();
 

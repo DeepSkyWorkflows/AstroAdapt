@@ -264,5 +264,23 @@ namespace AstroAdapt.Engine
                 workerCount,
                 correlationId);
         }
+
+        /// <inheritdoc/>
+        public async Task<Component> UpdateInventoryItemAsync(Component componentToUpdate)
+        {
+            using var ctx = GetContext();
+            ctx.Entry(componentToUpdate).State = EntityState.Modified;
+            await ctx.SaveChangesAsync();
+            return componentToUpdate;
+        }
+
+        /// <inheritdoc/>
+        public async Task DeleteSolutionAsync(Guid id)
+        {
+            using var ctx = GetContext();
+            var solutionToDelete = await ctx.Solutions.SingleAsync(c => c.Id == id);
+            ctx.Solutions.Remove(solutionToDelete);
+            await ctx.SaveChangesAsync();
+        }
     }
 }

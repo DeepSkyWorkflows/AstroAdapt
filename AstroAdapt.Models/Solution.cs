@@ -6,6 +6,12 @@
     public class Solution
     {
         /// <summary>
+        /// Creates an instance of the solut ion.
+        /// </summary>
+        public Solution()
+        { }
+
+        /// <summary>
         /// Gets or sets the target.
         /// </summary>
         public Component Target { get; set; } = null!;
