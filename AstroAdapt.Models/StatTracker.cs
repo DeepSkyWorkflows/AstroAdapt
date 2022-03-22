@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AstroAdapt.Models
+﻿namespace AstroAdapt.Models
 {
     /// <summary>
     /// Holds info about the progress of a solution.
@@ -37,6 +31,11 @@ namespace AstroAdapt.Models
         /// <returns>The count for the result.</returns>
         public long this[SolverResults idx] =>
             statistics.ContainsKey(idx) ? statistics[idx] : 0;
+
+        /// <summary>
+        /// Gets the correlation id.
+        /// </summary>
+        public long CorrelationId { get; set; }
 
         /// <summary>
         /// Creates a new instance and registers for updates.

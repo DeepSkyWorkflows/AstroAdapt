@@ -93,6 +93,29 @@ namespace AstroAdapt.Engine
             string? description = null);
 
         /// <summary>
+        /// Requests a solution using guids.
+        /// </summary>
+        /// <param name="target">The target lens to solve.</param>
+        /// <param name="sensor">The sesnor to solve.</param>
+        /// <param name="adapters">The available adapters.</param>
+        /// <param name="backFocusTolerance">The back focus tolerance.</param>
+        /// <param name="statsCallback">Receive pure stat updates.</param>
+        /// <param name="solutionUpdate">Receive solution progress updates.</param>
+        /// <param name="workerCount">null for auto, 0 for synchronous, anything else will asynchronously run the work count passed.</param>
+        /// <param name="correlationId"></param>
+        /// <returns>The final solution list.</returns>
+        Task<IEnumerable<Solution>> SolveImageTrainAsync(
+            Guid target,
+            Guid sensor,
+            IEnumerable<Guid> adapters,
+            double backFocusTolerance = 0.01,
+            Action<StatTracker>? statsCallback = null,
+            Action<SolutionEventArgs>? solutionUpdate = null,
+            int? workerCount = null,
+            long correlationId = 0);
+
+
+        /// <summary>
         /// Requests a solution.
         /// </summary>
         /// <param name="target">The target lens to solve.</param>
@@ -102,6 +125,7 @@ namespace AstroAdapt.Engine
         /// <param name="statsCallback">Receive pure stat updates.</param>
         /// <param name="solutionUpdate">Receive solution progress updates.</param>
         /// <param name="workerCount">null for auto, 0 for synchronous, anything else will asynchronously run the work count passed.</param>
+        /// <param name="correlationId"></param>
         /// <returns>The final solution list.</returns>
         Task<IEnumerable<Solution>> SolveImageTrainAsync(
             Component target,
@@ -110,7 +134,8 @@ namespace AstroAdapt.Engine
             double backFocusTolerance = 0.01,
             Action<StatTracker>? statsCallback = null,
             Action<SolutionEventArgs>? solutionUpdate = null,
-            int? workerCount = null);
+            int? workerCount = null,
+            long correlationId = 0);
 
         /// <summary>
         /// Gets or sets the path to images.

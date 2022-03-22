@@ -7,10 +7,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 var path = new AstroApp().PathToDatabase;
 
-builder.Services.AddScoped<IAstroApp>(sp => new AstroApp());
+builder.Services.AddSingleton<IAstroApp>(sp => new AstroApp());
 
 builder.Services.AddPooledDbContextFactory<AstroContext>(
     opts => opts.UseSqlite($"Data Source={path}"));
+
+builder.Services.AddSingleton<SolutionProcessingService>();
 
 builder.Services.AddGraphQLServer()
     .AddProjections()
@@ -19,14 +21,15 @@ builder.Services.AddGraphQLServer()
     .AddQueryType<Query>()
    //  .AddMutationType<Mutations>()
    //.AddTypeExtension<ObservationTypeExtensions>()
-   //  .AddSubscriptionType<SubscriptionsType>()
-   //.AddInMemorySubscriptions()
+    .AddSubscriptionType<Subscription>()
+    .AddInMemorySubscriptions()
    ;
 
 var app = builder.Build();
 
-app.MapGraphQL();
 app.UseRouting();
+app.UseWebSockets();
+app.UseEndpoints(endpoints => endpoints.MapGraphQL());
 
 var provider = app.Services.CreateScope().ServiceProvider;
 var astroApp = provider.GetService<IAstroApp>();

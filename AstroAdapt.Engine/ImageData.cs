@@ -1,4 +1,6 @@
-﻿namespace AstroAdapt.Engine
+﻿using AstroAdapt.Models;
+
+namespace AstroAdapt.Engine
 {
     /// <summary>
     /// Data for an image.
@@ -14,6 +16,11 @@
         /// Gets or sets the name of the file.
         /// </summary>
         public string? FileName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of component.
+        /// </summary>
+        public ComponentTypes Type { get; set; }
 
         /// <summary>
         /// Gets or sets the bytes of the image.

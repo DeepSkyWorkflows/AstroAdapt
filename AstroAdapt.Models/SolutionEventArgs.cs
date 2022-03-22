@@ -43,6 +43,11 @@
             this(sd, SolutionEventTypes.SolvingFinished) => payload = solutions;
 
         /// <summary>
+        /// Gets or sets a unique id to correlate messages.
+        /// </summary>
+        public long CorrelationId { get; set; }
+
+        /// <summary>
         /// Gets or sets the type of the event.
         /// </summary>
         public SolutionEventTypes EventType { get; private set; }

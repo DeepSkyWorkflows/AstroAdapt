@@ -63,6 +63,7 @@ namespace AstroAdapt.Engine
                 var image = new ImageData
                 {
                     Id = id,
+                    Type = type,
                     FileName = Path.GetFileName(file),
                     Image = await File.ReadAllBytesAsync(file)
                 };
@@ -184,7 +185,8 @@ namespace AstroAdapt.Engine
             double backFocusTolerance = 0.01,
             Action<StatTracker>? statsCallback = null,
             Action<SolutionEventArgs>? solutionUpdate = null,
-            int? workerCount = null)
+            int? workerCount = null,
+            long correlationId = 0)
         {
             if (workerCount == null)
             {
@@ -197,14 +199,21 @@ namespace AstroAdapt.Engine
 
             if (statsCallback != null)
             {
-                statTracker = new StatTracker(sd, statsCallback);
+                statTracker = new StatTracker(sd, statsCallback)
+                {
+                    CorrelationId = correlationId
+                };
             }
 
             EventHandler<SolutionEventArgs>? handler = null;
 
             if (solutionUpdate != null)
             {
-                handler = (o, e) => solutionUpdate(e);
+                handler = (o, e) =>
+                {
+                    e.CorrelationId = correlationId;
+                    solutionUpdate(e);
+                };
                 sd.SolutionChanged += handler;
             }
 
@@ -231,6 +240,29 @@ namespace AstroAdapt.Engine
             }
 
             return dbContextFactory.CreateDbContext();
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<Solution>> SolveImageTrainAsync(
+            Guid target,
+            Guid sensor,
+            IEnumerable<Guid> adapters,
+            double backFocusTolerance = 0.01,
+            Action<StatTracker>? statsCallback = null,
+            Action<SolutionEventArgs>? solutionUpdate = null,
+            int? workerCount = null,
+            long correlationId = 0)
+        {
+            var components = await LoadInventoryAsync();
+            return await SolveImageTrainAsync(
+                components.Single(c => c.Id == target),
+                components.Single(c => c.Id == sensor),
+                components.Where(c => adapters.Contains(c.Id)),
+                backFocusTolerance,
+                statsCallback,
+                solutionUpdate,
+                workerCount,
+                correlationId);
         }
     }
 }
