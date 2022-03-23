@@ -1,7 +1,6 @@
 ﻿using AstroAdapt.Data;
 using AstroAdapt.Engine;
 using AstroAdapt.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace AstroAdapt.GraphQL
 {
@@ -13,24 +12,24 @@ namespace AstroAdapt.GraphQL
         /// <summary>
         /// Gets all available inventory.
         /// </summary>
-        /// <param name="factory">The DbContext factory.</param>
+        /// <param name="context">The DbContext.</param>
         /// <returns>The list of inventory.</returns>
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Component> GetInventory([Service] IDbContextFactory<AstroContext> factory)
-            => factory.CreateDbContext().Components;
+        public IQueryable<Component> GetInventory(AstroContext context)
+            => context.Components;
 
         /// <summary>
         /// Gets all manufacturers.
         /// </summary>
-        /// <param name="factory">The DbContext factory.</param>
+        /// <param name="context">The DbContext.</param>
         /// <returns>The list of manufacturers.</returns>
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<Manufacturer> GetManufacturers([Service] IDbContextFactory<AstroContext> factory)
-            => factory.CreateDbContext().Manufacturers;
+        public IQueryable<Manufacturer> GetManufacturers(AstroContext context)
+            => context.Manufacturers;
 
         /// <summary>
         /// Get image bytes for display.
@@ -39,7 +38,7 @@ namespace AstroAdapt.GraphQL
         /// <param name="requestedImages">The list of images to resolve.</param>
         /// <returns>The images.</returns>
         public async Task<IEnumerable<ImageResponse>> GetImagesAsync(
-            [Service] IAstroApp astroApp,
+            IAstroApp astroApp,
             ImageRequest[] requestedImages)
             => (await astroApp.GetImagesForItemsAsync(requestedImages.Select(i => (i.Id, i.Type))))
             .Select(i => new ImageResponse(i));
@@ -84,14 +83,13 @@ namespace AstroAdapt.GraphQL
         /// <summary>
         /// Gets all saved solutions.
         /// </summary>
-        /// <param name="factory">The DbContext factory.</param>
+        /// <param name="context">The DbContext.</param>
         /// <returns>The list of solutions.</returns>
         [UseProjection]
         [UseFiltering]
         [UseSorting]
-        public IQueryable<SavedSolution> GetSavedSolutions(
-            [Service] IDbContextFactory<AstroContext> factory)
-            => factory.CreateDbContext().Solutions;
+        public IQueryable<SavedSolution> GetSavedSolutions(AstroContext context)
+            => context.Solutions;
 
     }
 }

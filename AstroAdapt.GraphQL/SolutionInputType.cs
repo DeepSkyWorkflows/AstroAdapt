@@ -14,7 +14,7 @@ namespace AstroAdapt.GraphQL
         protected override void Configure(IInputObjectTypeDescriptor<Solution> descriptor)
         {
             descriptor.Ignore(s => s.Deviance);
-            descriptor.Ignore(s => s.ComponentCount);            
+            descriptor.Ignore(s => s.ComponentCount);
         }
     }
 }
