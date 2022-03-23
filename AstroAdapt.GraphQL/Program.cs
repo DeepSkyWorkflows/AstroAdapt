@@ -2,6 +2,7 @@
 using AstroAdapt.Engine;
 using AstroAdapt.GraphQL;
 using AstroAdapt.Models;
+using HotChocolate.Subscriptions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,14 +17,17 @@ builder.Services.AddPooledDbContextFactory<AstroContext>(
 builder.Services.AddSingleton<SolutionProcessingService>();
 
 builder.Services.AddGraphQLServer()
+    .AddQueryType<Query>()
+    .AddMutationType<Mutation>()
+    .AddSubscriptionType<Subscription>()
+    .AddAstroTypes()
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .AddQueryType<Query>()
-    .AddType<SolutionInputType>()
-    .AddMutationType<Mutation>()
-    .AddTypeExtension<ComponentExtensions>()
-    .AddSubscriptionType<Subscription>()
+    .RegisterService<IAstroApp>()
+    .RegisterService<ITopicEventReceiver>()
+    .RegisterService<ITopicEventSender>()
+    .RegisterDbContext<AstroContext>(DbContextKind.Pooled)
     .AddInMemorySubscriptions();
 
 var app = builder.Build();

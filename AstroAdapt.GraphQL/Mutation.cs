@@ -1,6 +1,5 @@
 ﻿using AstroAdapt.Engine;
 using AstroAdapt.Models;
-using HotChocolate.Resolvers;
 
 namespace AstroAdapt.GraphQL
 {
@@ -18,8 +17,8 @@ namespace AstroAdapt.GraphQL
         /// <returns>The saved solution.</returns>
         public async Task<SavedSolution> SaveSolutionAsync(
             Solution solution,
-            [Service]IAstroApp astroService) =>
-            await astroService.SaveSolutionAsync(solution);                    
+            IAstroApp astroService) =>
+            await astroService.SaveSolutionAsync(solution);
 
         /// <summary>
         /// Delete a solution.
@@ -29,7 +28,7 @@ namespace AstroAdapt.GraphQL
         /// <returns>A value indicating whether the delete was successful.</returns>
         public async Task<bool> DeleteSolutionAsync(
             Guid savedSolutionId,
-            [Service] IAstroApp astroService)
+            IAstroApp astroService)
         {
             await astroService.DeleteSolutionAsync(savedSolutionId);
             return true;
