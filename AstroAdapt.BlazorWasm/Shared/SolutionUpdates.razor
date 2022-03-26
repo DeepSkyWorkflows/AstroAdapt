@@ -1,0 +1,64 @@
+﻿@if (SubmissionWorkflow != null)
+{
+    @if (CheckResults() != null)
+    {
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-3 text-center">
+                    <strong>Total Attempts</strong><br/>
+                    @totalSolutions
+                </div>
+                <div class="col-3 text-center">
+                    <strong>Total Successes</strong><br/>
+                    @totalSolved
+                </div>
+                <div class="col-6 text-center">
+                    <strong>Last Event</strong><br/>
+                    @lastEvent
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            🕒 Waiting for solution updates...
+        </div>
+    }
+}
+<span>&nbsp;</span>
+@code {
+    private int totalSolutions = 0;
+    private int totalSolved = 0;
+    private string lastEvent = string.Empty;
+
+    private IGetSolutionUpdates_SolutionUpdated_Args_Solution? lastSolution = null;
+    
+    [CascadingParameter]
+    public SolutionSubmissionWorkflow SubmissionWorkflow { get; set; }
+
+    private IGetSolutionUpdatesResult? CheckResults() 
+    {
+        var update = SubmissionWorkflow?.SolutionUpdate;
+        if (update != null)
+        {
+            var updated = update.SolutionUpdated;
+            if (updated == null)
+            {
+                return null;
+            }
+            if (updated.Args != null)
+            {
+                lastEvent = $"{updated.Args.EventType}: {updated.Args.SolverResult}";
+                totalSolutions = updated.Args.TotalSolvers;
+                totalSolved = updated.Args.TotalSolutions;
+                if (updated.Args.Solution != null)
+                {
+                    lastSolution = updated.Args.Solution ?? lastSolution;
+                }
+            }
+        }
+        return update;
+    }
+
+}

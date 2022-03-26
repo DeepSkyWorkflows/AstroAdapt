@@ -1,0 +1,54 @@
+﻿@inject AstroClient AstroClient
+
+@if (ParentWorkflow == null || workflow == null) 
+{
+    <Loading/>
+}
+else
+{
+    <div class="alert alert-info">        
+    @if (workflow.Stage == SubmissionWorkflowStage.RequestingCorrelationId)
+    {
+            <span>📄🚶 The lab assistant is loading your information into the system.</span>
+    }
+    @if (workflow.Stage == SubmissionWorkflowStage.SubscribingToUpdates)
+    {
+            <span>🔃 Requesting updates for job ticket @correlationId.</span>
+    }
+    @if (workflow.Stage == SubmissionWorkflowStage.SubscribingToFinalSolution)
+    {
+            <span>❓ Requesting a notification when job ticket @correlationId is completed.</span>
+    }
+    @if (workflow.Stage == SubmissionWorkflowStage.Solving)
+    {
+            <span>🧪 The lab is working on the solutions for problem ticket @correlationId.</span>
+    }
+    @if (workflow.Stage == SubmissionWorkflowStage.Done)
+    {
+            <span>✅ Ticket @correlationId is complete. The lab has exhausted all available solutions. See the results below.</span>
+    }
+    </div>
+    @if (workflow.Stage == SubmissionWorkflowStage.Solving)
+    {
+        <CascadingValue Value="@workflow">
+            <SolutionUpdates/>
+        </CascadingValue>
+    }
+    @if (workflow.Stage == SubmissionWorkflowStage.Done)
+    {
+        <ShowSolutions Result="@workflow.SolutionResult"/>
+    }
+}
+
+@code {
+    [CascadingParameter]
+    public SolverWorkflow? ParentWorkflow { get; set; }
+    private SolutionSubmissionWorkflow? workflow = null;
+    private long? correlationId => workflow.CorrelationId;
+    protected override void OnInitialized()
+    {
+        workflow ??= new SolutionSubmissionWorkflow(ParentWorkflow!, AstroClient, () => InvokeAsync(StateHasChanged));
+        WorkflowEngine.Begin(workflow.WorkflowSteps());
+        base.OnInitialized();
+    }
+}

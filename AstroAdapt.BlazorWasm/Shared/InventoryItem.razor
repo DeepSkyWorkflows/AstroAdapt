@@ -1,0 +1,40 @@
+﻿<div class="container-fluid">
+    @if (Component != null)
+    {
+        <div class="card @target @sensor">
+            <div class="row">
+                <div class="col-4 small text-left align-content-center p-3">
+                    @Component.TargetDirectionConnectionSize.ToString()
+                </div>
+                <div class="col-4 align-content-center">
+                    <InventoryImage AltText="@Component.Model" Image="@Component.Image"/>
+                </div>
+                <div class="col-4 small text-right align-content-center p-3">
+                    @Component.SensorDirectionConnectionSize.ToString()
+                </div>
+            </div>
+            <div class="card-header text-center">
+                @Component.ComponentType.ToString()    
+            </div>
+            <div class="card-body">
+                <div class="small text-center">@Component.Manufacturer?.Name @Component.Model</div>            
+            </div>
+        </div>
+    }
+</div>
+@code {
+    private string target => getClass();
+    private string sensor => getClass(false);     
+    private string getClass(bool isTarget = true)
+    {
+        if (Component == null)
+        {
+            return string.Empty;
+        }
+        return isTarget ? $"target-{Component.TargetDirectionConnectionType}" :
+            $"sensor-{Component.SensorDirectionConnectionType}";
+    }
+
+    [Parameter]
+    public IGetInventory_Inventory? Component { get; set; }
+}

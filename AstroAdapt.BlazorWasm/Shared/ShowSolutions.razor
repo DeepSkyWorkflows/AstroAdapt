@@ -1,0 +1,37 @@
+@if (Result != null && Result.ProblemSolved != null)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1">&nbsp;</div>
+            <div class="col-2 text-center"><strong>Weight</strong></div>
+            <div class="col-2 text-center"><strong>Length</strong></div>
+            <div class="col-2 text-center"><strong>Count</strong></div>
+            <div class="col-5 text-center"><strong>Components</strong></div>            
+        </div>
+    @foreach (var solution in Result.ProblemSolved.Solutions)
+    {
+        <div class="row">
+            <div class="col-1"><span class="oi oi-save"></span></div>
+            <div class="col-2 text-center">@solution.Weight</div>
+            <div class="col-2 text-center">@solution.LengthMm mm</div>
+            <div class="col-2 text-center">@solution.Connections.Count</div>
+            <div class="col-5 text-center">@solutionComponents(solution.Connections)</div>
+        </div>
+    }
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    public SolverWorkflow? Workflow { get; set;}
+
+    [Parameter]
+    public IGetFinalSolutionResult? Result { get; set;}
+
+    private string solutionComponents(IReadOnlyList<IGetFinalSolution_ProblemSolved_Solutions_Connections> connections) =>
+            string.Join(
+                " => ",
+                new [] { Workflow.Target.Model }.Union(
+                connections.Select(c => Workflow.Inventory.SingleOrDefault(i => i.Id == c.Id)?.Model))
+                .Union(new [] { Workflow.Sensor.Model }));    
+}

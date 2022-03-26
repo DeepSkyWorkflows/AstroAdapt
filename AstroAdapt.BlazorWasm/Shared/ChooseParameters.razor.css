@@ -1,0 +1,14 @@
+﻿.container-fluid.main {
+    height: 80vh;
+}
+.control-panel {
+    height: 45vh;
+}
+.selections {
+    height: 25vh;
+}
+
+img {
+    float: left;
+    margin: 2px;
+}

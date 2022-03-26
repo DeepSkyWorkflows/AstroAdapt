@@ -1,0 +1,12 @@
+﻿subscription GetFinalSolution($correlationId: String!) {
+  problemSolved(correlationId: $correlationId) {
+    solutions {      
+      backFocusMm,
+      lengthMm,
+      connections {
+        id        
+      },
+      weight
+    }
+  }
+}

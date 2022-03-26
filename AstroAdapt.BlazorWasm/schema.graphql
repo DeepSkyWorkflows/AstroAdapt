@@ -1,0 +1,792 @@
+﻿schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+"A solved result."
+input SolutionInput {
+  "Gets or sets the target."
+  target: ComponentInput!
+  "Gets or sets the sensor."
+  sensor: ComponentInput!
+  "Gets or sets the connections."
+  connections: [ComponentInput!]!
+  "Gets or sets the backfocus of the system."
+  backFocusMm: Float!
+  "Gets or sets the length of the system."
+  lengthMm: Float!
+  "Weight for sorting purposes."
+  weight: Int!
+  "A unique signature for the solution."
+  signature: String!
+}
+
+"Queries for the adapters."
+type Query {
+  "Gets all available inventory.\n\n\n**Returns:**\nThe list of inventory."
+  inventory(where: ComponentFilterInput order: [ComponentSortInput!]): [Component!]!
+  "Gets all manufacturers.\n\n\n**Returns:**\nThe list of manufacturers."
+  manufacturers(where: ManufacturerFilterInput order: [ManufacturerSortInput!]): [Manufacturer!]!
+  "Get image bytes for display.\n\n\n**Returns:**\nThe images."
+  images("The list of images to resolve." requestedImages: [ImageRequestInput!]!): [ImageResponse!]!
+  "Get a unique id for a solution. This will only queue the solution. You must subscribe\nto the \"ProblemSolved\" topic with the id to start the solver.\n\n\n**Returns:**\nA unique id you can use to subscribe for results."
+  solutionSubscriptionId("Id of target." targetId: UUID! "Id of sensor." sensorId: UUID! "Components for solution." components: [UUID!]! "Percent tolerance from back focus." backFocusTolerance: Float!): Long!
+  "Get the available options for a type.\n\n\n**Returns:**\nThe options."
+  optionsForType("The type." type: String!): [String!]!
+  "Gets all saved solutions.\n\n\n**Returns:**\nThe list of solutions."
+  savedSolutions(where: SavedSolutionFilterInput order: [SavedSolutionSortInput!]): [SavedSolution!]!
+}
+
+"GraphQL operations with side effects."
+type Mutation {
+  "Save a solution.\n\n\n**Returns:**\nThe saved solution."
+  saveSolution("The solution." solution: SolutionInput!): SavedSolution!
+  "Delete a solution.\n\n\n**Returns:**\nA value indicating whether the delete was successful."
+  deleteSolution("The id of the solution." savedSolutionId: UUID!): Boolean!
+}
+
+"Subscriptions for GraphQL."
+type Subscription {
+  "Update when the entire solution set is found.\n\n\n**Returns:**\nThe requested payload."
+  problemSolved("The unique id for the job." correlationId: String!): FinalSolution!
+  "Subscription for interim progress updates."
+  solutionUpdated("The unique id." correlationId: String!): SolutionProcessingUpdate!
+}
+
+"An actual component"
+input ComponentInput {
+  "Gets or sets the unique id of the component."
+  id: UUID!
+  "Gets the manufacturer of the component."
+  manufacturer: ManufacturerInput!
+  "Gets or sets the name of the model."
+  model: String!
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: Float!
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: Float!
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: Float!
+  "Gets or sets the type of the component"
+  componentType: ComponentTypes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: ConnectionSizes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: ConnectionSizes!
+  "Gets or sets a value indicating whether the directions of the component can be reversed."
+  isReversible: Boolean!
+  "Gets or sets the preferred insertion point."
+  insertionPoint: InsertionPoints!
+  "Code for report printing."
+  shortCode: String!
+}
+
+"An actual component"
+input ComponentFilterInput {
+  and: [ComponentFilterInput!]
+  or: [ComponentFilterInput!]
+  "Gets or sets the unique id of the component."
+  id: ComparableGuidOperationFilterInput
+  "Gets the manufacturer of the component."
+  manufacturer: ManufacturerFilterInput
+  "Gets or sets the name of the model."
+  model: StringOperationFilterInput
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the type of the component"
+  componentType: ComponentTypesOperationFilterInput
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: ConnectionTypesOperationFilterInput
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: ConnectionSizesOperationFilterInput
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: ConnectionTypesOperationFilterInput
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: ConnectionSizesOperationFilterInput
+  "Gets or sets a value indicating whether the directions of the component can be reversed."
+  isReversible: BooleanOperationFilterInput
+  "Gets or sets the preferred insertion point."
+  insertionPoint: InsertionPointsOperationFilterInput
+  "Code for report printing."
+  shortCode: StringOperationFilterInput
+}
+
+"An actual component"
+input ComponentSortInput {
+  "Gets or sets the unique id of the component."
+  id: SortEnumType
+  "Gets the manufacturer of the component."
+  manufacturer: ManufacturerSortInput
+  "Gets or sets the name of the model."
+  model: SortEnumType
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: SortEnumType
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: SortEnumType
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: SortEnumType
+  "Gets or sets the type of the component"
+  componentType: SortEnumType
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: SortEnumType
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: SortEnumType
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: SortEnumType
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: SortEnumType
+  "Gets or sets a value indicating whether the directions of the component can be reversed."
+  isReversible: SortEnumType
+  "Gets or sets the preferred insertion point."
+  insertionPoint: SortEnumType
+  "Code for report printing."
+  shortCode: SortEnumType
+}
+
+"Manufacturer of components"
+input ManufacturerFilterInput {
+  and: [ManufacturerFilterInput!]
+  or: [ManufacturerFilterInput!]
+  "Gets or sets the unique identifier for the manufacturer."
+  id: ComparableGuidOperationFilterInput
+  "Gets or sets the manufacturuer name."
+  name: StringOperationFilterInput
+  "Gets or sets the manufacturer home page"
+  homepage: UriFilterInput
+  "List of components by this manufacturer"
+  components: ListFilterInputTypeOfComponentFilterInput
+}
+
+"Manufacturer of components"
+input ManufacturerSortInput {
+  "Gets or sets the unique identifier for the manufacturer."
+  id: SortEnumType
+  "Gets or sets the manufacturuer name."
+  name: SortEnumType
+  "Gets or sets the manufacturer home page"
+  homepage: UriSortInput
+}
+
+"A saved combination."
+input SavedSolutionFilterInput {
+  and: [SavedSolutionFilterInput!]
+  or: [SavedSolutionFilterInput!]
+  "Gets or sets the unique identifier."
+  id: ComparableGuidOperationFilterInput
+  "Gets or sets the name."
+  name: StringOperationFilterInput
+  "Gets or sets the description."
+  description: StringOperationFilterInput
+  "Gets or sets the target for solution."
+  target: SolutionItemFilterInput
+  "Gets or sets the Sensor."
+  sensor: SolutionItemFilterInput
+  "Ordered list of solution items."
+  items: ListFilterInputTypeOfSolutionItemFilterInput
+}
+
+"A saved combination."
+input SavedSolutionSortInput {
+  "Gets or sets the unique identifier."
+  id: SortEnumType
+  "Gets or sets the name."
+  name: SortEnumType
+  "Gets or sets the description."
+  description: SortEnumType
+  "Gets or sets the target for solution."
+  target: SolutionItemSortInput
+  "Gets or sets the Sensor."
+  sensor: SolutionItemSortInput
+}
+
+input ComparableGuidOperationFilterInput {
+  eq: UUID
+  neq: UUID
+  in: [UUID!]
+  nin: [UUID!]
+  gt: UUID
+  ngt: UUID
+  gte: UUID
+  ngte: UUID
+  lt: UUID
+  nlt: UUID
+  lte: UUID
+  nlte: UUID
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  or: [StringOperationFilterInput!]
+  eq: String
+  neq: String
+  contains: String
+  ncontains: String
+  in: [String]
+  nin: [String]
+  startsWith: String
+  nstartsWith: String
+  endsWith: String
+  nendsWith: String
+}
+
+input ComparableDoubleOperationFilterInput {
+  eq: Float
+  neq: Float
+  in: [Float!]
+  nin: [Float!]
+  gt: Float
+  ngt: Float
+  gte: Float
+  ngte: Float
+  lt: Float
+  nlt: Float
+  lte: Float
+  nlte: Float
+}
+
+input ComponentTypesOperationFilterInput {
+  eq: ComponentTypes
+  neq: ComponentTypes
+  in: [ComponentTypes!]
+  nin: [ComponentTypes!]
+}
+
+input ConnectionTypesOperationFilterInput {
+  eq: ConnectionTypes
+  neq: ConnectionTypes
+  in: [ConnectionTypes!]
+  nin: [ConnectionTypes!]
+}
+
+input ConnectionSizesOperationFilterInput {
+  eq: ConnectionSizes
+  neq: ConnectionSizes
+  in: [ConnectionSizes!]
+  nin: [ConnectionSizes!]
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input InsertionPointsOperationFilterInput {
+  eq: InsertionPoints
+  neq: InsertionPoints
+  in: [InsertionPoints!]
+  nin: [InsertionPoints!]
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+input UriFilterInput {
+  and: [UriFilterInput!]
+  or: [UriFilterInput!]
+  absolutePath: StringOperationFilterInput
+  absoluteUri: StringOperationFilterInput
+  localPath: StringOperationFilterInput
+  authority: StringOperationFilterInput
+  hostNameType: UriHostNameTypeOperationFilterInput
+  isDefaultPort: BooleanOperationFilterInput
+  isFile: BooleanOperationFilterInput
+  isLoopback: BooleanOperationFilterInput
+  pathAndQuery: StringOperationFilterInput
+  segments: ListStringOperationFilterInput
+  isUnc: BooleanOperationFilterInput
+  host: StringOperationFilterInput
+  port: ComparableInt32OperationFilterInput
+  query: StringOperationFilterInput
+  fragment: StringOperationFilterInput
+  scheme: StringOperationFilterInput
+  originalString: StringOperationFilterInput
+  dnsSafeHost: StringOperationFilterInput
+  idnHost: StringOperationFilterInput
+  isAbsoluteUri: BooleanOperationFilterInput
+  userEscaped: BooleanOperationFilterInput
+  userInfo: StringOperationFilterInput
+}
+
+input ListFilterInputTypeOfComponentFilterInput {
+  all: ComponentFilterInput
+  none: ComponentFilterInput
+  some: ComponentFilterInput
+  any: Boolean
+}
+
+input UriSortInput {
+  absolutePath: SortEnumType
+  absoluteUri: SortEnumType
+  localPath: SortEnumType
+  authority: SortEnumType
+  hostNameType: SortEnumType
+  isDefaultPort: SortEnumType
+  isFile: SortEnumType
+  isLoopback: SortEnumType
+  pathAndQuery: SortEnumType
+  isUnc: SortEnumType
+  host: SortEnumType
+  port: SortEnumType
+  query: SortEnumType
+  fragment: SortEnumType
+  scheme: SortEnumType
+  originalString: SortEnumType
+  dnsSafeHost: SortEnumType
+  idnHost: SortEnumType
+  isAbsoluteUri: SortEnumType
+  userEscaped: SortEnumType
+  userInfo: SortEnumType
+}
+
+"An item in a solution list."
+input SolutionItemFilterInput {
+  and: [SolutionItemFilterInput!]
+  or: [SolutionItemFilterInput!]
+  "Gets or sets the unique id of the item."
+  id: ComparableGuidOperationFilterInput
+  "Order in the soluion."
+  sequence: ComparableInt32OperationFilterInput
+  "Gets or sets the guid of the related component."
+  componentId: ComparableGuidOperationFilterInput
+  "Gets the manufacturer and model of the component."
+  itemName: StringOperationFilterInput
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: ComparableDoubleOperationFilterInput
+  "Gets or sets the type of the component"
+  componentType: ComponentTypesOperationFilterInput
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: ConnectionTypesOperationFilterInput
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: ConnectionSizesOperationFilterInput
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: ConnectionTypesOperationFilterInput
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: ConnectionSizesOperationFilterInput
+  "Code for report printing."
+  shortCode: StringOperationFilterInput
+}
+
+input ListFilterInputTypeOfSolutionItemFilterInput {
+  all: SolutionItemFilterInput
+  none: SolutionItemFilterInput
+  some: SolutionItemFilterInput
+  any: Boolean
+}
+
+"An item in a solution list."
+input SolutionItemSortInput {
+  "Gets or sets the unique id of the item."
+  id: SortEnumType
+  "Order in the soluion."
+  sequence: SortEnumType
+  "Gets or sets the guid of the related component."
+  componentId: SortEnumType
+  "Gets the manufacturer and model of the component."
+  itemName: SortEnumType
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: SortEnumType
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: SortEnumType
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: SortEnumType
+  "Gets or sets the type of the component"
+  componentType: SortEnumType
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: SortEnumType
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: SortEnumType
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: SortEnumType
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: SortEnumType
+  "Code for report printing."
+  shortCode: SortEnumType
+}
+
+input UriHostNameTypeOperationFilterInput {
+  eq: UriHostNameType
+  neq: UriHostNameType
+  in: [UriHostNameType!]
+  nin: [UriHostNameType!]
+}
+
+input ListStringOperationFilterInput {
+  all: StringOperationFilterInput
+  none: StringOperationFilterInput
+  some: StringOperationFilterInput
+  any: Boolean
+}
+
+input ComparableInt32OperationFilterInput {
+  eq: Int
+  neq: Int
+  in: [Int!]
+  nin: [Int!]
+  gt: Int
+  ngt: Int
+  gte: Int
+  ngte: Int
+  lt: Int
+  nlt: Int
+  lte: Int
+  nlte: Int
+}
+
+scalar UUID
+
+"The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"Request an image."
+input ImageRequestInput {
+  "The id of the component."
+  id: UUID!
+  "The type of the component."
+  type: ComponentTypes!
+}
+
+"A set of image data."
+type ImageResponse {
+  "The id of the component the image correlates to."
+  id: UUID!
+  "The type of  the component."
+  type: ComponentTypes!
+  "The filename for browser downloads and to determine the file type."
+  filename: String!
+  "The base64 encoded image bytes."
+  data: String!
+}
+
+"Manufacturer of components"
+type Manufacturer {
+  "Gets or sets the unique identifier for the manufacturer."
+  id: UUID!
+  "Gets or sets the manufacturuer name."
+  name: String!
+  "Gets or sets the manufacturer home page"
+  homepage: URL
+  "List of components by this manufacturer"
+  components: [Component!]!
+}
+
+"Extend component to enable fetching the image."
+type Component {
+  "Reverse the orientation"
+  reverse: Component!
+  "Creates a copy.\n\n\n**Returns:**\nThe cloned copy."
+  clone: Component!
+  "Gets or sets the unique id of the component."
+  id: UUID!
+  "Gets the manufacturer of the component."
+  manufacturer: Manufacturer!
+  "Gets or sets the name of the model."
+  model: String!
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: Float!
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: Float!
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: Float!
+  "Gets or sets the type of the component"
+  componentType: ComponentTypes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: ConnectionSizes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: ConnectionSizes!
+  "Gets or sets a value indicating whether the directions of the component can be reversed."
+  isReversible: Boolean!
+  "Gets or sets the preferred insertion point."
+  insertionPoint: InsertionPoints!
+  "Code for report printing."
+  shortCode: String!
+  image: ImageData
+}
+
+"A saved combination."
+type SavedSolution {
+  "Gets or sets the unique identifier."
+  id: UUID!
+  "Gets or sets the name."
+  name: String!
+  "Gets or sets the description."
+  description: String!
+  "Gets or sets the target for solution."
+  target: SolutionItem!
+  "Gets or sets the Sensor."
+  sensor: SolutionItem!
+  "Ordered list of solution items."
+  items: [SolutionItem!]!
+}
+
+"Final message when solution is solved."
+type FinalSolution {
+  "Unique id to correlate messages."
+  correlationId: Long!
+  "The list of available solutions."
+  solutions: [Solution!]!
+}
+
+"Message to update a solution-in-progress."
+type SolutionProcessingUpdate {
+  "Id of the request."
+  correlationId: Long!
+  "The stats."
+  statistics: [KeyValuePairOfSolverResultsAndInt64!]!
+  "The args."
+  args: SolutionEventArgs
+}
+
+"Data for an image."
+type ImageData {
+  "The id of the related component."
+  id: UUID
+  "Gets or sets the name of the file."
+  fileName: String
+  "Gets or sets the type of component."
+  type: ComponentTypes!
+  "Gets or sets the bytes of the image."
+  image: [Byte!]
+}
+
+"Manufacturer of components"
+input ManufacturerInput {
+  "Gets or sets the unique identifier for the manufacturer."
+  id: UUID!
+  "Gets or sets the manufacturuer name."
+  name: String!
+  "Gets or sets the manufacturer home page"
+  homepage: URL
+  "List of components by this manufacturer"
+  components: [ComponentInput!]!
+}
+
+"Types of components in the image train."
+enum ComponentTypes {
+  "Optical tube assembly"
+  OTA
+  "Adapt one fitting to another"
+  ADAPTER
+  "Attaches to the scope"
+  VISUAL_BACK
+  "Adds space to the image train"
+  SPACER
+  "Spacer flush with sensor (usually)."
+  NOSE_PIECE
+  "Manages filters"
+  FILTER_WHEEL
+  "Holds a filter"
+  FILTER_DRAWER
+  "Direct filter"
+  FILTER
+  "Barlow lens"
+  BARLOW
+  "Diagonal for comfort viewing"
+  DIAGONAL
+  "Focal reducer or field flattener"
+  FOCAL_REDUCER
+  "Off-axis guider"
+  OAG
+  "Sensor such as camera (CCD, CMOS, etc.)"
+  SENSOR
+  "Eye piece for viewing"
+  EYEPIECE
+  "Allows rotation"
+  COMPRESSION_RING
+  "Other component type"
+  OTHER
+}
+
+"Receivers are compatible with Extruders"
+enum ConnectionTypes {
+  "Dual can both insert and receive"
+  DUAL
+  "Terminates a side of the image train"
+  TERMINATOR
+  "Inserter is a tube or exposed threads that insert into a receiver"
+  INSERTER
+  "Receiver is a hole that may or may not contain threads"
+  RECEIVER
+}
+
+"Sizes available for connections"
+enum ConnectionSizes {
+  "Empty connection"
+  ZERO
+  "M12x0.5 \"Webcam\""
+  M12
+  "1 inch \"Video\" thread"
+  VIDEOX1IN
+  "1.25\" eyepiece, etc."
+  M285X125
+  "T\/T2 thread"
+  M42
+  "M42 with sleeve"
+  M42_WITH125_SLEEVE
+  "Maksutov thread"
+  M445
+  "48mm \"wide\" T, 2\" filter"
+  M48T
+  "M48 with 2\" sleeve option"
+  M48_WITH_TWO_INCH_SLEEVE
+  "1\" sleeve"
+  ONE_QUARTER_INCH_SLEEVE
+  "2\" sleeve"
+  TWO_INCH_SLEEVE
+  "2\" SCT thread"
+  SMALL_SCT
+  "3.25\" threads"
+  LARGE_SCT325
+  "3.28\" threads"
+  LARGE_SCT328
+}
+
+"How a compoent can be inserted."
+enum InsertionPoints {
+  "Must be flush to component at target."
+  FLUSH_TO_TARGET
+  "Prefers to be close to the target."
+  PREFER_TARGET
+  "No preference."
+  NO_PREFERENCE
+  "Prefers to be closer to sensor."
+  PREFER_SENSOR
+  "Must be flush to sensor."
+  FLUSH_TO_SENSOR
+}
+
+enum UriHostNameType {
+  UNKNOWN
+  BASIC
+  DNS
+  I_PV4
+  I_PV6
+}
+
+scalar URL
+
+"The `Byte` scalar type represents non-fractional whole numeric values. Byte can represent values between 0 and 255."
+scalar Byte
+
+"Events generated by the solver."
+type SolutionEventArgs {
+  "Gets or sets a unique id to correlate messages."
+  correlationId: Long!
+  "Gets or sets the type of the event."
+  eventType: SolutionEventTypes!
+  "Number of solutions actively queued."
+  totalSolvers: Int!
+  "Gets the count of successful solutions."
+  totalSolutions: Int!
+  "Reason to trigger the update."
+  solverResult: SolverResults!
+  "Gets the solution."
+  solution: Solution
+  "Gets all solutions."
+  solutions: [Solution!]
+}
+
+type KeyValuePairOfSolverResultsAndInt64 {
+  key: SolverResults!
+  value: Long!
+}
+
+"A solved result."
+type Solution {
+  "Gets or sets the target."
+  target: Component!
+  "Gets or sets the sensor."
+  sensor: Component!
+  "Gets or sets the connections."
+  connections: [Component!]!
+  "Gets the count of components."
+  componentCount: Int!
+  "Gets or sets the backfocus of the system."
+  backFocusMm: Float!
+  "Gets or sets the length of the system."
+  lengthMm: Float!
+  "Weight for sorting purposes."
+  weight: Int!
+  "Gets or sets the deviance from backfocus of the system."
+  deviance: Float!
+  "A unique signature for the solution."
+  signature: String!
+}
+
+"An item in a solution list."
+type SolutionItem {
+  "Gets or sets the unique id of the item."
+  id: UUID!
+  "Order in the soluion."
+  sequence: Int!
+  "Gets or sets the guid of the related component."
+  componentId: UUID!
+  "Gets the manufacturer and model of the component."
+  itemName: String!
+  "Gets or sets the distance the thread is recessed in millimeters. This can automatically\nreduce the amount of backfocus needed."
+  threadRecessMm: Float!
+  "Gets or sets the back focus requirement. Backfocus is computed from the component that\nis closest to the sensor."
+  backFocusMm: Float!
+  "Gets or sets the lenth of the component in millimeters."
+  lengthMm: Float!
+  "Gets or sets the type of the component"
+  componentType: ComponentTypes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  targetDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for cmpatbility."
+  targetDirectionConnectionSize: ConnectionSizes!
+  "Gets or sets the connection type facing the imaging target (sky)."
+  sensorDirectionConnectionType: ConnectionTypes!
+  "Gets or sets the size of the connection for compatbility."
+  sensorDirectionConnectionSize: ConnectionSizes!
+  "Code for report printing."
+  shortCode: String!
+}
+
+"Results from a pass through the solver."
+enum SolverResults {
+  "No change in status."
+  INFO
+  "Finished due to forking for further solutions."
+  FORKED
+  "No more compatible parts."
+  DEAD_END
+  "Used all of the parts available to connect to the sensor."
+  NO_SENSOR_CONNECTION
+  "Back focus is unacceptable length."
+  OUTSIDE_TOLERANCE
+  "A duplication solution exists."
+  DUPLICATE
+  "The problem was solved within tolerances."
+  SOLVED
+}
+
+"Events for the solution engine."
+enum SolutionEventTypes {
+  "A new solution workload was spawned."
+  SOLVER_SPAWNED
+  "A new solution was found."
+  SOLUTION_FOUND
+  "A single work item finished."
+  SOLVER_DONE
+  "All solvers have finished."
+  SOLVING_FINISHED
+}

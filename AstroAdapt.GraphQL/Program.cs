@@ -30,8 +30,13 @@ builder.Services.AddGraphQLServer()
     .RegisterDbContext<AstroContext>(DbContextKind.Pooled)
     .AddInMemorySubscriptions();
 
+builder.Services.AddCors(
+    p => p.AddPolicy("demo",
+        p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));    
+
 var app = builder.Build();
 
+app.UseCors("demo");
 app.UseRouting();
 app.UseWebSockets();
 app.UseEndpoints(endpoints => endpoints.MapGraphQL());

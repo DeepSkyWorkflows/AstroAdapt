@@ -1,0 +1,25 @@
+﻿query GetInventory {
+ inventory {
+   id,
+   backFocusMm,
+   componentType,
+   shortCode,
+   targetDirectionConnectionSize,
+   targetDirectionConnectionType,
+   sensorDirectionConnectionSize,
+   sensorDirectionConnectionType,
+   isReversible,
+   insertionPoint,
+   image {
+     id,
+     fileName,
+     image
+   },
+   lengthMm,
+   manufacturer {
+     name
+   },
+   model,
+   threadRecessMm
+ }
+}

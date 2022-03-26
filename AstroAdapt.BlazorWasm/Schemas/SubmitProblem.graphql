@@ -1,0 +1,3 @@
+﻿query SubmitProblem($targetId: UUID!, $sensorId: UUID!, $components: [UUID!]!, $backFocusTolerance: Float!) {
+    solutionSubscriptionId(targetId: $targetId, sensorId: $sensorId, components: $components, backFocusTolerance: $backFocusTolerance)
+}

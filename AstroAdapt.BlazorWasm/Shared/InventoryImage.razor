@@ -1,0 +1,22 @@
+﻿@if (Image != null)
+{
+    <a download="@Image.FileName">
+        <img width="@size" height="@size" src="@imageSrc" alt="@AltText"/>
+    </a>
+}
+
+@code {
+    [Parameter]
+    public bool Compact { get; set; } = true;
+
+    private int size => Compact ? 64 : 256;
+
+    private string imageSrc => Image == null ? string.Empty :
+        $"data:image/{Image.FileName.Split('.')[1]};base64,{Convert.ToBase64String(Image.Image.ToArray())}";
+
+    [Parameter]
+    public IGetInventory_Inventory_Image? Image { get; set; }
+
+    [Parameter]
+    public string? AltText { get; set;}
+}

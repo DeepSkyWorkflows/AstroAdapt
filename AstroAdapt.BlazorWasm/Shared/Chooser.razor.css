@@ -1,0 +1,19 @@
+﻿#chooser {
+    max-height: 300px;
+    width: 100%;
+    overflow: scroll;    
+}
+
+.wrapper {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.wrapper:hover {
+    padding: 10px;
+    background: lightgray;
+}
+
+.selected {
+    border: solid 2px red;
+}

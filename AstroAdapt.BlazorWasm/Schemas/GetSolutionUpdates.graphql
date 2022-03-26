@@ -1,0 +1,23 @@
+﻿subscription GetSolutionUpdates($correlationId: String!) {
+  solutionUpdated(correlationId: $correlationId) {
+    args {
+      eventType,
+      solution {
+        backFocusMm,
+        lengthMm,
+        deviance,
+        componentCount,
+        connections {
+            id
+        }
+      }
+      solverResult,
+      totalSolvers,
+      totalSolutions
+    }
+    statistics {
+      key
+      value
+    }
+  }
+}

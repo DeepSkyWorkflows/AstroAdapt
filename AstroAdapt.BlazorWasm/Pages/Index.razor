@@ -1,0 +1,38 @@
+﻿@page "/"
+@inject AstroClient AstroClient
+    
+
+<PageTitle>Solver</PageTitle>
+
+@if (workflow == null)
+{
+    <Loading/>
+}
+
+<CascadingValue Value="@workflow">
+@if (workflow != null)
+{
+    if (workflow.Stage == SolverWorkflowStage.LoadComponents)
+    {
+        <Loading/>
+    }
+    if (workflow.Stage == SolverWorkflowStage.ChooseParameters)
+    {        
+        <ChooseParameters/>
+    }    
+    if (workflow.Stage == SolverWorkflowStage.Solving)
+    {
+        <SolutionSolvingDashboard/>
+    }
+}
+</CascadingValue>
+
+@code {
+    private SolverWorkflow? workflow = null;
+    protected override void OnInitialized()
+    {
+        workflow ??= new SolverWorkflow(() => InvokeAsync(StateHasChanged), AstroClient);
+        WorkflowEngine.Begin(workflow.SolverWorkflowSteps());
+        base.OnInitialized();
+    }
+}

@@ -1,0 +1,113 @@
+﻿<h4>@Title</h4>
+@if (MultiSelect)
+{
+    <button class="btn btn-sm btn-link" @onclick="@(()=>SelectAll())">Select all</button>
+    <span>&nbsp;</span>
+    <button class="btn btn-sm btn-link" @onclick="@(()=>DeselectAll())">Deselect all</button>
+}
+<div id="chooser">
+    @foreach (var item in Inventory)
+    {
+        <a href="#" @onclick="@(()=>ChangeSelection(item))">
+            <div class="@(() => selectedState(item.Id))">
+                <InventoryItem Component="@item"/>
+            </div>
+        </a>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    public SolverWorkflow? Workflow { get; set; }
+
+    [Parameter]
+    public bool MultiSelect { get; set; } = false;
+
+    [Parameter]
+    public string Title { get; set; } = "Choose:";
+
+    [Parameter]
+    public Func<SolverWorkflow, IGetInventory_Inventory[]>? InitInventory { get; set; }
+
+    [Parameter]
+    public Func<SolverWorkflow, Guid[]>? InitSelectedIds { get; set; }
+
+    [Parameter]
+    public Action<Guid, bool>? SelectionChangedAction { get; set; }
+
+
+    public IGetInventory_Inventory[] Inventory { get; set; } = Array.Empty<IGetInventory_Inventory>();
+
+    public Guid[] SelectedIds
+    {
+        get => selectedItems.ToArray();
+        set
+        {
+            selectedItems.AddRange(value);
+        }
+    }
+
+    private string selectedState(Guid id) =>
+        selectedItems.Contains(id) ? "wrapper selected" : "wrapper";
+
+    private List<Guid> selectedItems = new List<Guid>();
+
+    protected override void OnInitialized()
+    {
+        if (Workflow != null)
+        {
+            Inventory = InitInventory(Workflow);
+            SelectedIds = InitSelectedIds(Workflow);
+        }
+        base.OnInitialized();
+    }
+
+    public void ChangeSelection(IGetInventory_Inventory item)
+    {
+        if (MultiSelect)
+        {
+            var selected = false;
+            if (selectedItems.Contains(item.Id))
+            {
+                selectedItems.Remove(item.Id);
+            }
+            else
+            {
+                selected = true;
+                selectedItems.Add(item.Id);
+            }
+            SelectionChangedAction?.Invoke(item.Id, selected);
+            return;
+        }
+
+        if (selectedItems.Contains(item.Id))
+        {
+            return;
+        }
+
+        if (selectedItems.Any())
+        {
+            SelectionChangedAction?.Invoke(selectedItems[0], false);
+        }
+
+        selectedItems.Clear();
+        selectedItems.Add(item.Id);
+        SelectionChangedAction?.Invoke(item.Id, true);
+    }
+
+    private void SelectAll()
+    {
+        foreach(var item in Inventory.Where(s => !selectedItems.Contains(s.Id)))
+        {
+            ChangeSelection(item);
+        }
+    }
+
+    public void DeselectAll()
+    {
+        foreach(var item in Inventory.Where(s => selectedItems.Contains(s.Id)))
+        {
+            ChangeSelection(item);
+        }
+    }
+}

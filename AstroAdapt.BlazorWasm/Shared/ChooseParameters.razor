@@ -1,0 +1,177 @@
+﻿@if (Workflow == null || Workflow.Loading)
+{
+    <div class="alert alert-info">💾 Loading...</div>
+}
+else 
+{
+    <div class="container-fluid main">
+        <div class="row control-panel"> 
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-3">
+                        <strong>Target:</strong>
+                        <br/>
+                        @if (Workflow != null && Workflow.Target != null)
+                        {
+                            <InventoryItem Component="@Workflow.Target" />
+                        }
+                        else
+                        {
+                            <span>⌛</span>
+                        }
+                    </div>
+                    <div class="col-3">
+                        <strong>Sensor:</strong>
+                        <br/>
+                        @if (Workflow != null && Workflow.Sensor != null)
+                        {
+                            <InventoryItem Component="@Workflow.Sensor" />
+                        }
+                        else
+                        {
+                            <span>⌛</span>
+                        }
+                    </div>
+                    <div class="col-6">
+                        <strong>Components</strong>
+                        @if (Workflow != null && Workflow.SelectedInventory != null)
+                        {
+                            foreach(var item in Workflow.SelectedInventory)
+                            {
+                                <InventoryImage Compact="true" Image="@item.Image"
+                                AltText="@item.Model"/>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    @if (isReady && Workflow != null)
+                    {
+                        <div class="col-12 alert alert-success">
+                            <button class="btn btn-primary m-3" @onclick="@(()=>Workflow.Ready())">
+                                Find me solutions!
+                            </button>
+                        </div>                        
+                    }
+                    else 
+                    {
+                        <div class="col-12 alert alert-info">
+                            Choose at least two components to get started.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row selections"> 
+                <ul class="nav nav-tabs" id="pickComponents" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link @active(1)" id="target-tab" data-toggle="tab" href="#target" 
+                    role="tab" aria-controls="target"
+                    aria-selected="@(selection == 1)"
+                    @onclick="@(() => selection = 1)"
+                    >Target</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @active(2)" id="sensor-tab" data-toggle="tab" href="#sensor" 
+                    role="tab" aria-controls="sensor"
+                    aria-selected="@(selection == 2)"
+                    @onclick="@(() => selection = 2)"
+                    >Sensor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @active(3)" id="components-tab" data-toggle="tab" href="#components" 
+                    role="tab" aria-controls="components"
+                    aria-selected="@(selection == 3)"
+                    @onclick="@(() => selection = 3)"
+                    >Components</a>
+                </li>                
+            </ul>
+            <div class="tab-content" id="pickComponentsContent">
+                <div class="tab-pane fade @showActive(1)" id="target" role="tabpanel" aria-labelledby="target-tab">
+                    <Chooser  
+                            InitInventory="@(w => w.Targets)"
+                            InitSelectedIds="@(w => new [] { w.Target.Id })"
+                            Title="Choose your target:" 
+                            MultiSelect="false"
+                            SelectionChangedAction="OnTargetChanged"/>
+                </div>
+                <div class="tab-pane fade @showActive(2)" id="sensor" role="tabpanel" aria-labelledby="sensor-tab">
+                    <Chooser  
+                            InitInventory="@(w => w.Sensors)"
+                            InitSelectedIds="@(w => new [] { w.Sensor.Id })"
+                            Title="Choose your sensor:" 
+                            MultiSelect="false"
+                            SelectionChangedAction="OnSensorChanged"/>
+                </div>
+                <div class="tab-pane fade @showActive(3)" id="components" role="tabpanel" aria-labelledby="components-tab">
+                    <Chooser  
+                            InitInventory="@(w => w.Inventory)"
+                            InitSelectedIds="@(w => Array.Empty<Guid>())"
+                            Title="Choose your components:" 
+                            MultiSelect="true"
+                            SelectionChangedAction="OnComponentChanged"/>
+                </div>
+
+            </div>
+       </div>
+    </div>
+}
+@code {
+    [CascadingParameter]
+    public SolverWorkflow? Workflow { get; set; }
+
+    private int selection = 1;
+
+    private string active(int selected) => selection == selected ? "active" : string.Empty;
+
+    private string showActive(int selected) => selection == selected ? "show active" : string.Empty;
+
+    private bool isSelected(Guid id) => Workflow == null ? false : 
+        Workflow.SelectedInventory.Any(i => i.Id == id);
+
+    private bool isReady => Workflow == null ? false :
+        Workflow!.Target != null &&
+        Workflow!.Sensor != null &&
+        Workflow!.SelectedInventory.Length > 1;
+
+    private void OnTargetChanged(Guid id, bool selected)
+    {
+        if (selected && Workflow != null)
+        {
+            Workflow.Target = Workflow.Targets.Single(t => t.Id == id);
+            Workflow.RefreshUi();
+        }
+    }
+
+    private void OnSensorChanged(Guid id, bool selected)
+    {
+        if (selected && Workflow != null)
+        {
+            Workflow.Sensor = Workflow.Sensors.Single(s => s.Id == id);
+            Workflow.RefreshUi();
+        }
+    }
+
+    private void OnComponentChanged(Guid id, bool selected)
+    {
+        if (Workflow == null)
+        {
+            return;
+        }
+
+        if (selected && !Workflow.SelectedInventory.Any(si => si.Id == id))
+        {
+            var newComponent = Workflow.Inventory.Single(si => si.Id == id);
+            Workflow.SelectedInventory = Workflow.SelectedInventory.Union(new[] { newComponent })
+                .ToArray();
+            Workflow.RefreshUi();
+        }
+        else if (!selected && Workflow.SelectedInventory.Any(si => si.Id == id))
+        {
+            Workflow.SelectedInventory = Workflow.SelectedInventory.Where(si => si.Id != id)
+                .ToArray();
+            Workflow.RefreshUi();
+        }
+    }
+}
+ 

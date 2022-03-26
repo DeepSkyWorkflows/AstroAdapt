@@ -1,0 +1,52 @@
+﻿.card {
+    width: 200px;
+    height: 180px;
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: solid 2px lightgray;
+}
+
+.small {    
+    font-size: 0.6em;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.target-Terminator {
+    border-left: solid 5px green;
+}
+
+.target-Dual {
+    border-left: solid 5px gray;
+}
+
+.target-Inserter {
+    border-left: solid 5px blue;
+}
+
+.target-Receiver {
+    border-left: solid 5px black;
+}
+
+.sensor-Terminator {
+    border-right: solid 5px red;
+}
+
+.sensor-Dual {
+    border-right: solid 5px gray;
+}
+
+.sensor-Inserter {
+    border-right: solid 5px blue;
+}
+
+.sensor-Receiver {
+    border-right: solid 5px black;
+}
