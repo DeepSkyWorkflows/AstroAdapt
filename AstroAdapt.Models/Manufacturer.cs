@@ -23,6 +23,6 @@
         /// <summary>
         /// List of components by this manufacturer
         /// </summary>
-        public List<Component> Components { get; private set; } = new List<Component>();
+        public List<Component> Components { get; set; } = new List<Component>();
     }
 }

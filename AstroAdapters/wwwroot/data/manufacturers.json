@@ -1,0 +1,668 @@
+{
+  "$id": "1",
+  "$values": [
+    {
+      "$id": "2",
+      "Id": "55a71e7f-f2c6-483e-8253-b497128178f7",
+      "Name": "Zhumell",
+      "Homepage": null,
+      "Components": {
+        "$id": "3",
+        "$values": [
+          {
+            "$id": "4",
+            "Id": "26e52c0b-c56f-4d32-a958-eaba15e577fd",
+            "Manufacturer": {
+              "$ref": "2"
+            },
+            "Model": "Barlow extender",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 41,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 10,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "Extender"
+          },
+          {
+            "$id": "5",
+            "Id": "56bec412-d534-4f48-81fd-a6eddb4c2879",
+            "Manufacturer": {
+              "$ref": "2"
+            },
+            "Model": "2x Barlow",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 24,
+            "ComponentType": 8,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": false,
+            "InsertionPoint": 2,
+            "ShortCode": "Barlow"
+          }
+        ]
+      }
+    },
+    {
+      "$id": "6",
+      "Id": "79aaef4d-9a0d-477e-b587-8291508a3477",
+      "Name": "ZWO",
+      "Homepage": null,
+      "Components": {
+        "$id": "7",
+        "$values": [
+          {
+            "$id": "8",
+            "Id": "81562c8a-5585-45d2-9704-58dad83c8b04",
+            "Manufacturer": {
+              "$ref": "6"
+            },
+            "Model": "ASI294MCPro",
+            "ThreadRecessMm": 6.5,
+            "BackFocusMm": 0,
+            "LengthMm": 0,
+            "ComponentType": 12,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 1,
+            "SensorDirectionConnectionSize": 0,
+            "IsReversible": false,
+            "InsertionPoint": 4,
+            "ShortCode": "294MC"
+          },
+          {
+            "$id": "9",
+            "Id": "f0060cfb-24b3-4473-bc21-626f16fb52eb",
+            "Manufacturer": {
+              "$ref": "6"
+            },
+            "Model": "ASI120MM-S",
+            "ThreadRecessMm": 12.5,
+            "BackFocusMm": 0,
+            "LengthMm": 0,
+            "ComponentType": 12,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 1,
+            "SensorDirectionConnectionSize": 0,
+            "IsReversible": false,
+            "InsertionPoint": 4,
+            "ShortCode": "120MM"
+          },
+          {
+            "$id": "10",
+            "Id": "f142a72a-d1af-4f68-ac88-f80f821c4cdb",
+            "Manufacturer": {
+              "$ref": "6"
+            },
+            "Model": "5 filter 1.25in Electronic Filter Wheel",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 20,
+            "ComponentType": 5,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 4,
+            "ShortCode": "EFW"
+          }
+        ]
+      }
+    },
+    {
+      "$id": "11",
+      "Id": "93fad1fa-750c-4801-a14e-6710b7660c79",
+      "Name": "Generic",
+      "Homepage": null,
+      "Components": {
+        "$id": "12",
+        "$values": [
+          {
+            "$id": "13",
+            "Id": "00394542-1e92-4bf1-b1ae-b0e69f70c1db",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-F 16",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 16,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MF16"
+          },
+          {
+            "$id": "14",
+            "Id": "00cc475e-3841-459c-a066-637b7f5858b4",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48F M42M 7",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 7,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMM7"
+          },
+          {
+            "$id": "15",
+            "Id": "04d0da85-548c-457a-92ae-bf67c3d29b51",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "2 in. to M48 30mm Compression Ring",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 30,
+            "ComponentType": 14,
+            "TargetDirectionConnectionType": 0,
+            "TargetDirectionConnectionSize": 8,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "Sleeve"
+          },
+          {
+            "$id": "16",
+            "Id": "07e08da2-e698-4c4d-9ddc-9860db8d9a3f",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-F 20",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 20,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MF20"
+          },
+          {
+            "$id": "17",
+            "Id": "22a20a0f-e45f-44ee-8680-2bd68af2ec72",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-M 2",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 2,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MM2"
+          },
+          {
+            "$id": "18",
+            "Id": "2970e549-8537-40f2-8fb4-79c2be06deb5",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "2 in. 15mm Compression Ring",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 15,
+            "ComponentType": 14,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 10,
+            "SensorDirectionConnectionType": 0,
+            "SensorDirectionConnectionSize": 8,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "Sleeve"
+          },
+          {
+            "$id": "19",
+            "Id": "2e96a349-2f41-4af6-a0b2-571522a8b7e0",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 5",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 5,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF5"
+          },
+          {
+            "$id": "20",
+            "Id": "3299840e-e919-499e-9dd3-275d708bbf7f",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-F 21",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 21,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MF21"
+          },
+          {
+            "$id": "21",
+            "Id": "33f792d6-c8b0-4d4a-96ce-c3f01e22de3d",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 Nosepiece",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 1,
+            "ComponentType": 4,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42"
+          },
+          {
+            "$id": "22",
+            "Id": "3fb5fdd8-99f6-42da-9445-5a192ee28793",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 30",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 30,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF30"
+          },
+          {
+            "$id": "23",
+            "Id": "47bd358c-7d8f-43d4-986c-062953db0e9f",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "2 in. to M48 35mm Compression Ring",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 35,
+            "ComponentType": 14,
+            "TargetDirectionConnectionType": 0,
+            "TargetDirectionConnectionSize": 8,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "Sleeve"
+          },
+          {
+            "$id": "24",
+            "Id": "4f7d2615-efc0-4aff-adce-d56637865147",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "1.25 M42 Compression Ring 30mm",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 30,
+            "ComponentType": 14,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": false,
+            "InsertionPoint": 2,
+            "ShortCode": "M42"
+          },
+          {
+            "$id": "25",
+            "Id": "5aca67a3-8231-42a8-b145-2fb05dbc50b6",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-F 5",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 5,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MF5"
+          },
+          {
+            "$id": "26",
+            "Id": "5af1d8fe-404e-415e-9efa-9b9a8d11e126",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 10",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 10,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF10"
+          },
+          {
+            "$id": "27",
+            "Id": "6346d83a-fd08-4746-900c-344cc10d8151",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 20",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 20,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF20"
+          },
+          {
+            "$id": "28",
+            "Id": "89e8916e-d31e-4bb8-ad7a-af2a99cda1f7",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 16.5",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 16.5,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF16.5"
+          },
+          {
+            "$id": "29",
+            "Id": "99cb21b5-fc22-4434-adef-b3a27b22504e",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48M M42F 30",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 30,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF30"
+          },
+          {
+            "$id": "30",
+            "Id": "9a9adf97-3e61-437f-b6e2-544879d822cc",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 to 1.25in 21",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 21,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42toin21"
+          },
+          {
+            "$id": "31",
+            "Id": "9b38c2f7-ddae-495e-af12-48531a562973",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 Nosepiece",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 1,
+            "ComponentType": 4,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42"
+          },
+          {
+            "$id": "32",
+            "Id": "9ee5e2f3-bdfe-43f2-a375-213c121eb144",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 M-F 6.5",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 6.5,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42MF6.5"
+          },
+          {
+            "$id": "33",
+            "Id": "b0453166-50aa-41ec-8d6b-cf0fc0c5f9f7",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M48 M-F 30",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 30,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 7,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 7,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M48TMF30"
+          },
+          {
+            "$id": "34",
+            "Id": "bff5615c-d4aa-4966-8fc4-8d81ddda5abd",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 F-F 11",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 11,
+            "ComponentType": 1,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42FF11"
+          },
+          {
+            "$id": "35",
+            "Id": "fd79d8c7-7848-44ba-8e9b-ef7367ac2052",
+            "Manufacturer": {
+              "$ref": "11"
+            },
+            "Model": "M42 Nosepiece",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 1,
+            "ComponentType": 4,
+            "TargetDirectionConnectionType": 2,
+            "TargetDirectionConnectionSize": 4,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": true,
+            "InsertionPoint": 2,
+            "ShortCode": "M42"
+          }
+        ]
+      }
+    },
+    {
+      "$id": "36",
+      "Id": "b2562264-0404-4ba4-8f67-3ca7b195d372",
+      "Name": "Svbony",
+      "Homepage": null,
+      "Components": {
+        "$id": "37",
+        "$values": [
+          {
+            "$id": "38",
+            "Id": "ac6c1004-96dc-414f-8956-b6a1f1f16183",
+            "Manufacturer": {
+              "$ref": "36"
+            },
+            "Model": "SV503 70ED",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 55,
+            "LengthMm": 0,
+            "ComponentType": 0,
+            "TargetDirectionConnectionType": 1,
+            "TargetDirectionConnectionSize": 0,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 10,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "SV503"
+          }
+        ]
+      }
+    },
+    {
+      "$id": "39",
+      "Id": "ff1698af-6b82-4fd0-a901-50a9bf125b97",
+      "Name": "Celestron",
+      "Homepage": null,
+      "Components": {
+        "$id": "40",
+        "$values": [
+          {
+            "$id": "41",
+            "Id": "64b702fe-bb27-4ca0-83a7-471b8f73d14b",
+            "Manufacturer": {
+              "$ref": "39"
+            },
+            "Model": "EdgeHD 9.25",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 146.5,
+            "LengthMm": 0,
+            "ComponentType": 0,
+            "TargetDirectionConnectionType": 1,
+            "TargetDirectionConnectionSize": 0,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 12,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "Edge925"
+          },
+          {
+            "$id": "42",
+            "Id": "98629a8d-7495-49ce-96e1-e0a2798847bb",
+            "Manufacturer": {
+              "$ref": "39"
+            },
+            "Model": "Visual Back T2 M42",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 91,
+            "ComponentType": 2,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 12,
+            "SensorDirectionConnectionType": 2,
+            "SensorDirectionConnectionSize": 4,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "SCT325"
+          },
+          {
+            "$id": "43",
+            "Id": "e460efaf-b190-434c-96ba-64abe9095b53",
+            "Manufacturer": {
+              "$ref": "39"
+            },
+            "Model": "Visual Back Sleeve",
+            "ThreadRecessMm": 0,
+            "BackFocusMm": 0,
+            "LengthMm": 71,
+            "ComponentType": 2,
+            "TargetDirectionConnectionType": 3,
+            "TargetDirectionConnectionSize": 12,
+            "SensorDirectionConnectionType": 3,
+            "SensorDirectionConnectionSize": 9,
+            "IsReversible": false,
+            "InsertionPoint": 0,
+            "ShortCode": "SCT325"
+          }
+        ]
+      }
+    }
+  ]
+}

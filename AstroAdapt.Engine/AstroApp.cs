@@ -1,4 +1,5 @@
-﻿using AstroAdapt.Data;
+﻿using System.Text.Json;
+using AstroAdapt.Data;
 using AstroAdapt.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -113,6 +114,16 @@ namespace AstroAdapt.Engine
             {
                 await AstroSeed.SeedDatabaseAsync(ctx);
             }
+
+            var manufacturers = ctx.Manufacturers.Include(m => m.Components).ToList();
+            var opts = new JsonSerializerOptions
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            };
+            var json = JsonSerializer.Serialize(manufacturers, opts);
+            var test = JsonSerializer.Deserialize<List<Manufacturer>>(json, opts);
+            var tgtJson = PathToDatabase.Replace("astroapp.sqlite", $"{nameof(manufacturers)}.json");
+            File.WriteAllText(tgtJson, json);
         }
 
         /// <inheritdoc/>

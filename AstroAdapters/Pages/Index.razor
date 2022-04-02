@@ -1,0 +1,34 @@
+﻿@inject IAppHost AppHost
+@page "/"
+
+<PageTitle>Astro Adapters</PageTitle>
+
+@if(AppHost.IsBusy)
+{
+    <div class="alert alert-info">💾 We're loading data from a floppy disk...</div>
+}
+else
+{
+    @if (components.Any())
+    {
+        <ul>
+            @foreach(var component in components)
+            {
+                <li>@component.ToString()</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <div class="alert alert-danger">No components were found. Please check your configuration.</div>
+    }
+}
+@code {
+    private List<Component> components = new List<Component>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        components = await AppHost.GetComponentsAsync();
+        await base.OnInitializedAsync();
+    }
+}
