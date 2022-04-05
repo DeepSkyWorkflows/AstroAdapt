@@ -16,7 +16,7 @@ namespace AstroAdapt.Models
         private readonly Dictionary<Guid, byte> bitMap = new();
         private readonly Dictionary<Guid, int> byteMap = new();
         private readonly Dictionary<Guid, byte[]> dependencies = new();
-
+        
         /// <summary>
         /// Gets or sets the available domain of solutions.
         /// </summary>
@@ -43,8 +43,7 @@ namespace AstroAdapt.Models
         /// </summary>
         /// <returns>The solution set.</returns>
         public IEnumerable<Solution> GetSolutions() =>
-            Solutions.Distinct().OrderBy(s => Math.Floor(s.Deviance * 1000)).ThenBy(s => s.ComponentCount)
-                .ThenBy(s => s.Weight);
+            Solutions.OrderByDescending(s => s.Weight);
 
         /// <summary>
         /// Raised when the solution status changes;
@@ -484,60 +483,75 @@ namespace AstroAdapt.Models
         /// <returns>The weight.</returns>
         private static int ComputeWeight(Solution solution)
         {
-            int weight = 1; // participation reward
+            var inverseDeviance = 1.0 - solution.DeviancePct;
+            if (inverseDeviance > 1)
+            {
+                inverseDeviance = 1;
+            }
+            var weight = inverseDeviance < 0 ? 1 : 10000 * inverseDeviance;
+            var distanceFromTarget = 0;
+            var distanceToSensor = solution.Connections.Count - 1;
             for (var idx = 0; idx < solution.Connections.Count; idx++)
             {
-                var distanceFromTarget = idx;
-                var distanceToSensor = solution.Connections.Count - idx - 1;
                 var component = solution.Connections[idx];
                 switch (component.InsertionPoint)
                 {
                     case InsertionPoints.FlushToTarget:
-                        if (distanceFromTarget == 1)
+                        if (distanceFromTarget == 0
+                            || (distanceFromTarget == 1
+                            && solution.Connections[0].LengthMm <= 5))
                         {
                             weight += 1000;
                         }
                         else
                         {
-                            weight -= 50 * distanceFromTarget;
+                            weight += -50 * distanceFromTarget;
                         }
                         break;
                     case InsertionPoints.PreferTarget:
-                        if (distanceFromTarget == 1)
+                        if (distanceFromTarget == 0
+                            || (distanceFromTarget == 1
+                            && solution.Connections[0].LengthMm <= 5))
                         {
                             weight += 100;
                         }
                         else
                         {
-                            weight -= 10 * distanceFromTarget;
+                            weight += -10 * distanceFromTarget;
                         }
                         break;
                     case InsertionPoints.PreferSensor:
-                        if (distanceToSensor == 1)
+                        if (distanceToSensor == 0
+                            || (distanceToSensor == 1
+                            && solution.Connections[^1].LengthMm <= 5))
                         {
                             weight += 100;
                         }
                         else
                         {
-                            weight -= 10 * distanceToSensor;
+                            weight += -10 * distanceToSensor;
                         }
                         break;
                     case InsertionPoints.FlushToSensor:
-                        if (distanceToSensor == 1)
+                        if (distanceToSensor == 0
+                            || (distanceToSensor == 1
+                            && solution.Connections[^1].LengthMm <= 5))
                         {
                             weight += 1000;
                         }
                         else
                         {
-                            weight -= 50 * distanceToSensor;
+                            weight += -50 * distanceToSensor;    
                         }
                         break;
                     default:
-                        weight += 1;
+                        weight--;
                         break;
                 }
+                distanceFromTarget++;
+                distanceToSensor--;
             }
-            return weight;
+            return (int)Math.Floor(weight * 100);
         }
     }
 }

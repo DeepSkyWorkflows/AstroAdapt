@@ -134,6 +134,19 @@ namespace AstroAdapt.Models
         /// Gets a string representation of the component.
         /// </summary>
         /// <returns>The string representation.</returns>
+        public string ToShortString()
+        {
+            var sb = new StringBuilder();
+            sb.Append($"{TargetDirectionConnectionType.AsVisualString(true)} ");
+            sb.Append($"{ShortCode ?? Model}");
+            sb.Append($"{SensorDirectionConnectionType.AsVisualString(false)} ");
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Gets a string representation of the component.
+        /// </summary>
+        /// <returns>The string representation.</returns>
         public override string ToString()
         {
             var sb = new StringBuilder();

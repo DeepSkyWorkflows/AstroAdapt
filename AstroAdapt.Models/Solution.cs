@@ -52,6 +52,11 @@
         public double Deviance => Math.Abs(BackFocusMm - LengthMm);
 
         /// <summary>
+        /// Percentage of deviance.
+        /// </summary>
+        public double DeviancePct => Deviance / BackFocusMm;
+
+        /// <summary>
         /// Equality of solutions.
         /// </summary>
         /// <param name="obj">The other object.</param>
@@ -74,7 +79,18 @@
         /// Gets the string representation.
         /// </summary>
         /// <returns>The string representation.</returns>
+        public string ToShortString() =>
+            $"Weight: {Weight} BF: {BackFocusMm} Len: {LengthMm} Deviance: {Deviance} (PCT: {DeviancePct * 100}%)"
+            + $"{Environment.NewLine}"
+            + $"{string.Join(" | ", Connections.Select(c => c.ToShortString()).ToArray())}";
+
+        /// <summary>
+        /// Gets the string representation.
+        /// </summary>
+        /// <returns>The string representation.</returns>
         public override string ToString() =>
-            $"BF: {BackFocusMm} Len: {LengthMm} {string.Join(" | ", Connections.Select(c => c.ToString()).ToArray())}";
+            $"Weight: {Weight} BF: {BackFocusMm} Len: {LengthMm} Deviance: {Deviance} (PCT: {DeviancePct * 100}%)"
+            + $"{Environment.NewLine}"
+            + $"{string.Join(" | ", Connections.Select(c => c.ToString()).ToArray())}";
     }
 }
