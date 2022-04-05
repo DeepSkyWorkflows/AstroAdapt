@@ -1,0 +1,9 @@
+﻿div {
+    background: black;
+    font-family: Consolas, 'Global Monospace', monospace, sans-serif;
+    color: lightgreen;
+    font-size: 0.8em;
+    padding: 0.2em;
+    overflow: clip;
+    width: 90%;
+}

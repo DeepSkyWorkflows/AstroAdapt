@@ -1,0 +1,40 @@
+﻿@inject IAppHost AppHost
+@using Timer=System.Timers.Timer
+<div id="status">@status</div>
+
+@code {
+    private string status = "Initializing...";
+    private string queuedStatus = string.Empty;
+    private long lastStatusReceived = DateTime.Now.Ticks;
+    private long debounceInterval = TimeSpan.FromMilliseconds(50).Ticks;
+    private Timer? tock = null;
+
+    protected override void OnInitialized()
+    {
+        AppHost.OnStatusUpdated += (o, e) => StatusUpdated(e);
+        base.OnInitialized();
+    }
+
+    private void StatusUpdated(string status)
+    {
+        if (tock != null)
+        {
+            tock.Dispose();
+            tock = null;
+        }
+
+        var now = DateTime.Now.Ticks;
+        var diff = now - lastStatusReceived;
+        if (diff < debounceInterval)
+        {
+            queuedStatus = status;
+            tock = new Timer(diff);
+            tock.Elapsed += (o, e) => InvokeAsync(() => StatusUpdated(queuedStatus));
+            tock.Enabled = true;
+        }
+
+        lastStatusReceived = now;
+        this.status = status;
+        InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,0 +1,86 @@
+﻿@inject IAppHost AppHost
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">🌙 Astro Adapters</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <button class="btn btn-sm @btnStatus" title="@btnHint" @onclick="@(async () => await ToggleLogAsync())">@logStatus</button>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-calculator" aria-hidden="true"></span> Solver
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="solutions">
+                <span class="oi oi-circle-check" aria-hidden="true"></span> Solutions
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="inventory">
+                <span class="oi oi-layers" aria-hidden="true"></span> Inventory
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="inventory">
+                <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Backup &amp; Restore
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private string logStatus => logToConsole ? "Logging to Console" : "Not Logging";
+    private string btnStatus => logToConsole ? "btn-success" : "btn-danger";
+    private string btnHint => logToConsole 
+    ? "Click to stop logging status messages to the console." 
+    : "Click to log status to the console.";
+    private bool logToConsole = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var prefs = await AppHost.GetPreferencesAsync();
+        logToConsole = prefs.LogToConsole;
+        await base.OnInitializedAsync();
+    }
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task ToggleLogAsync()
+    {
+        if (logToConsole)
+        {
+            AppHost.OnStatusUpdated -= ConsoleLogger;
+            logToConsole = false;            
+        }
+        else
+        {
+            AppHost.OnStatusUpdated += ConsoleLogger;
+            logToConsole = true;
+        }
+        var prefs = await AppHost.GetPreferencesAsync();
+        prefs.LogToConsole = logToConsole;
+        await AppHost.SavePreferencesAsync(prefs);        
+    }
+
+    private void ConsoleLogger(object? sender, string args)
+    {
+        if (logToConsole)
+        {
+            Console.WriteLine(args);
+        }
+    }
+}
