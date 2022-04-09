@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using AstroAdapt.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace AstroAdapters.Services
@@ -49,6 +50,12 @@ namespace AstroAdapters.Services
             var module = await moduleTask.Value;
             var json = JsonSerializer.Serialize(obj, jsonOpts);
             var _ = await module.InvokeAsync<bool>(methodName, json);
+        }
+
+        public async Task<string> ResolveImageAsync(Component component)
+        {
+            var module = await moduleTask.Value;
+            return await module.InvokeAsync<string>("resolveImage", component.Id.ToString(), component.ComponentType.ToString()); 
         }
     }
 }

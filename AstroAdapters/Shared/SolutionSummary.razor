@@ -1,0 +1,32 @@
+﻿@inject ISolverWizard SolverWizard
+@inject IChannel Channel
+
+<h3>Top 10 Solutions</h3>
+<div class="wrapper">
+@foreach(var solution in SolverWizard.Stats!.Solutions.OrderByDescending(s => s.Weight).Take(10))
+{
+    <div class="@getClass(solution)">Len: @solution.LengthMm Deviance: @solution.Deviance (@(solution.DeviancePct*100)%) @string.Join(' ', solution.Connections.Select(c => c.ShortCode))</div>
+}
+</div>
+
+@code {
+    private string getClass(Solution solution)
+    {
+        var bg = "tolerable";
+        if (solution.Deviance == 0)
+        {
+            bg = "good";
+        }
+        else if (solution.DeviancePct > 1)
+        {
+            bg = "bad";
+        }
+        return $"detail {bg}";
+    }
+
+    protected override void OnInitialized()
+    {
+        Channel.Subscribe<StatTracker>(nameof(StatTracker), (topic, payload) => InvokeAsync(StateHasChanged));        
+        base.OnInitialized();
+    }
+}

@@ -11,15 +11,19 @@ html, body {
     background-size: cover;
     margin-left: 20vw;
     margin-top: 30vh;
-    font-size: 4em;
+    font-size: 10vh;
     font-weight: bold;
     text-align: center;
 }
 
-    .loading > span {
-        vertical-align: middle;
-        color: red;
-    }
+.loadingText {
+    color: red;
+    padding-top: 10vh;
+}
+
+.loading > span {
+    color: red;
+}
 
 h1:focus {
     outline: none;

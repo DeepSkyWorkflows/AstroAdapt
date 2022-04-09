@@ -1,0 +1,116 @@
+﻿@if (Component != null)
+{
+    <div aria-disabled="@(!Selectable)" aria-selected="@Selected" title="@title" class="card @extras" @onclick="@(() => Clicked())">
+        <h5 class="card-title"><ComponentImage SmallSize=true Component="@Component" />
+        @Component.Manufacturer?.Name @Component.Model</h5>
+        <p>
+            <strong>@Component.ComponentType</strong>&nbsp;<strong>BF:</strong> @($"{Component.BackFocusMm}mm")
+            &nbsp;<strong>Len:</strong> @($"{Component.LengthMm}mm");
+        </p>
+        <p>
+            <button disabled="@(true)" class="btn btn-sm btn-success">
+                @foreach (var iconClass in icon(Component.TargetDirectionConnectionType))
+                {
+                    <span class="@iconClass"></span>
+                    <span>&nbsp;</span>
+                }
+                @Component.TargetDirectionConnectionSize
+            </button>
+        </p>
+        <p>
+            <button disabled="@(true)" class="btn btn-sm btn-dark">
+                @if (Component.IsReversible)
+                {
+                    <span class="oi oi-loop-circular"></span>
+                }
+                @Component.ShortCode
+            </button>
+        </p>
+        <p>
+            <button disabled="@(true)" class="btn btn-sm btn-danger">
+                @Component.SensorDirectionConnectionSize
+                <span>&nbsp;</span>
+                @foreach (var iconClass in icon(Component.SensorDirectionConnectionType))
+                {
+                    <span class="@iconClass"></span>
+                    <span>&nbsp;</span>
+                }
+            </button>
+        </p>
+        <p>@Component.InsertionPoint</p>        
+    </div>
+}
+
+@if (EmptyCard)
+{
+    <div class="card">&nbsp;</div>
+}
+
+@code {
+    private bool selected = false;
+
+    [Parameter]
+    public Component? Component { get; set; }
+
+    [Parameter]
+    public bool EmptyCard { get; set; }
+
+    [Parameter]
+    public bool Selected
+    {
+        get => selected;
+        set 
+        {
+            if (value != selected)
+            {
+                selected = value;
+                OnSelectedChanged.InvokeAsync(Component);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Component> OnSelectedChanged { get; set; }
+
+    [Parameter]
+    public bool Selectable { get; set; }
+
+    private string extras => Selectable
+        ? (Selected ? "selectable selected" : "selectable")
+        : string.Empty;
+
+    private string title => Selected
+        ? $"(SELECTED) {Component}" :
+        $"{Component}";
+
+    private string[] icon(ConnectionTypes type)
+    {
+        var result = Array.Empty<string>();
+        switch (type)
+        {
+            case ConnectionTypes.Terminator:
+                result = new[] { "oi oi-x" };
+                break;
+            case ConnectionTypes.Dual:
+                result = new[] { "oi oi-key", "oi oi-lock-locked" };
+                break;
+            case ConnectionTypes.Inserter:
+                result = new[] { "oi oi-key" };
+                break;
+            default:
+                result = new[] { "oi oi-lock-locked" };
+                break;
+        }
+        return result;
+    }
+
+    private void Clicked()
+    {
+        if (!Selectable)
+        {
+            return;
+        }
+
+        Selected = !Selected;
+    }
+}

@@ -1,0 +1,116 @@
+﻿@inject IChannel Channel
+
+<div class="host">
+    <p>
+        @if (MultiSelect && Components!.Count() > SelectedComponents.Count())
+        {
+            <button class="btn btn-primary btn-sm" @onclick="@(() => SelectAll())">Select All</button>
+                <span>&nbsp;</span>
+        }
+        @if (MultiSelect && SelectedComponents.Any())
+        {
+            <button class="btn btn-primary btn-sm" @onclick="@(() => SelectNone())">Select None</button>
+            <span>&nbsp;</span>
+        }
+        <strong>@Title</strong>
+    </p>
+    @if (Components != null && Components.Any())
+    {
+        @foreach (var component in Components)
+        {
+            <Button @key="@component.Id" 
+                    class="btn btn-sm btn-@(IsSelected(component) ? "success" : "danger")"
+                    @onclick="@(() => SelectedToggle(component))" title="@component.ToString()">
+                    <ComponentImage Component="@component" SmallSize="true"/>
+                    <div>@component.Manufacturer?.Name @component.Model</div>
+            </Button><span>&nbsp;</span>
+        }
+       
+    }
+    else if (Components != null)
+    {
+        <div class="alert alert-danger">No available components.</div>
+    }
+</div>
+
+@code {
+    private bool canSelectAll => MultiSelect && Components != null && Components.Count > SelectedComponents.Count;
+    private bool canSelectNone => MultiSelect && Components != null && SelectedComponents.Count > 0;
+
+    [Parameter]
+    public List<Component>? Components { get; set; }
+
+    [Parameter]
+    public bool MultiSelect { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<IEnumerable<Component>> OnSelectionChanged { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public Component[]? InitialSelection { get; set; }
+
+    public List<Component> SelectedComponents { get; private set; } = new List<Component>();
+
+    protected override void OnInitialized()
+    {
+        Channel.Subscribe<Component>(nameof(SelectedToggle), (_, c) =>
+        {
+            if (c != null)
+            {
+                InvokeAsync(() => SelectedToggle(c));
+            }
+        });
+
+        if (InitialSelection != null && InitialSelection.Any())
+        {
+            SelectedComponents.AddRange(InitialSelection);
+        }
+
+        base.OnInitialized();
+    }
+
+    private bool IsSelected(Component component) => SelectedComponents.Contains(component);
+
+    private void SelectAll()
+    {
+        SelectedComponents.Clear();
+        SelectedComponents.AddRange(Components!);
+        OnSelectionChanged.InvokeAsync(SelectedComponents);
+    }
+
+    private void SelectNone()
+    {
+        SelectedComponents.Clear();
+        OnSelectionChanged.InvokeAsync(Enumerable.Empty<Component>());
+    }
+
+    public void SelectedToggle(Component component)
+    {
+        if (!MultiSelect)
+        {
+            if (SelectedComponents.Contains(component))
+            {
+                SelectedComponents.Clear();
+                OnSelectionChanged.InvokeAsync(Enumerable.Empty<Component>());
+                return;
+            }
+            SelectedComponents.Clear();
+            SelectedComponents.Add(component);
+            OnSelectionChanged.InvokeAsync(new[] { component });
+            return;
+        }
+
+        if (SelectedComponents.Contains(component))
+        {
+            SelectedComponents.Remove(component);
+        }
+        else
+        {
+            SelectedComponents.Add(component);
+        }
+        OnSelectionChanged.InvokeAsync(SelectedComponents);
+    }
+}

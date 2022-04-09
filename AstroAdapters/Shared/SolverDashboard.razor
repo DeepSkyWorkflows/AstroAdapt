@@ -1,0 +1,96 @@
+﻿@inject ISolverWizard SolverWizard
+@inject IChannel Channel
+
+@if (SolverWizard.Stage == SolutionStage.Ready)
+{
+    <h2>⌛ Submitting job...</h2>
+}
+else
+{
+    @if (Stats != null)
+    {
+        <h3>@Stats.Title</h3>
+        <div class="stat">
+            <div class="label">
+                Time elapsed:
+            </div>
+            <div class="value blue">
+                @Stats.RunningTime
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Total attempts:
+            </div>
+            <div class="value blue">
+                @Stats.TotalAttempts
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Total forks:
+            </div>
+            <div class="value blue">
+                @Stats.ForkedSolutions
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Solved:
+            </div>
+            <div class="value green">
+                @Stats.Solved
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Duplicates:
+            </div>
+            <div class="value red">
+                @Stats.IgnoredAsDuplicate
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Dead-ends:
+            </div>
+            <div class="value red">
+                @Stats.AbortedDeadEnd
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Outside of tolerance:
+            </div>
+            <div class="value red">
+                @Stats.AbortedOutsideTolerance
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                Impossible solutions:
+            </div>
+            <div class="value red">
+                @Stats.AbortedNoSensor
+            </div>
+        </div>
+    }
+}
+@code {
+    [Parameter]
+    public SolverStats? Stats { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        Channel.Subscribe<StatTracker>(nameof(StatTracker), (topic, payload) => InvokeAsync(StateHasChanged));
+        Channel.Subscribe<ISolverWizard>(nameof(SolutionStage), (topic, stage) => InvokeAsync(StateHasChanged));
+        return base.OnInitializedAsync();
+    }
+}

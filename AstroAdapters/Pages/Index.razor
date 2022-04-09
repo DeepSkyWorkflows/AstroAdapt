@@ -1,34 +1,142 @@
 ﻿@inject IAppHost AppHost
+@inject ISolverWizard SolverWizard
+@inject IChannel Channel
 @page "/"
-
 <PageTitle>Astro Adapters</PageTitle>
 
-@if(AppHost.IsBusy)
+@if (AppHost.IsBusy)
 {
     <div class="alert alert-info">💾 We're loading data from a floppy disk...</div>
 }
 else
 {
-    @if (components.Any())
-    {
-        <ul>
-            @foreach(var component in components)
-            {
-                <li>@component.ToString()</li>
-            }
-        </ul>
-    }
-    else
-    {
-        <div class="alert alert-danger">No components were found. Please check your configuration.</div>
-    }
-}
-@code {
-    private List<Component> components = new List<Component>();
+    <CascadingValue Value="SolverWizard">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    @if (SolverWizard.Stage == SolutionStage.Ready || SolverWizard.Stage == SolutionStage.Running)
+                    {
+                        <SolverDashboard Stats="@SolverWizard.Stats"/>
+                    }
+                    else
+                    {
+                    <div class="@circleClass(SolverWizard.Target != null)">1</div>
+                    <span>&nbsp;</span>
+                    <div class="btn-wrapper">
+                        <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetTarget))" disabled="@(SolverWizard.Stage == SolutionStage.SetTarget)">
+                            Set Target
+                            @if (SolverWizard.Target != null)
+                                {
+                                @SolverWizard.Target.ToShortString()
+                                    ;
+                                }
+                        </button>
+                    </div>
+                    <div class="arrow">&nbsp;</div>
+                    <span class="@circleClass(SolverWizard.Sensor != null)">2</span>
+                    <span>&nbsp;</span>
+                    @if (SolverWizard.Target != null)
+                        {
+                        <div class="btn-wrapper">
+                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetSensor))" disabled="@(SolverWizard.Stage == SolutionStage.SetSensor)">
+                                Set Sensor
+                                @if (SolverWizard.Sensor != null)
+                                    {
+                                    @SolverWizard.Sensor.ToShortString()
+                                        ;
+                                    }
+                            </button>
+                        </div>
+                        <span class="arrow">&nbsp;</span>
+                        }
+                    <span class="@circleClass(SolverWizard.SelectedConnectors.Count > 1)">3</span>
 
-    protected override async Task OnInitializedAsync()
+                    <span>&nbsp;</span>
+                    @if (SolverWizard.Sensor != null)
+                        {
+                        <div class="btn-wrapper">
+                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetConnectors))" disabled="@(SolverWizard.Stage == SolutionStage.SetConnectors)">
+                                Select Connectors
+                                @if (SolverWizard.SelectedConnectors.Any())
+                                    {
+                                    @SolverWizard.SelectedConnectors.Count()
+                                    }
+                            </button>
+                        </div>
+                        <span class="arrow">&nbsp;</span>
+                        }
+                    <span class="@circleClass(SolverWizard.SelectedConnectors.Count > 1)">4</span>
+
+                    <span>&nbsp;</span>
+                    @if (SolverWizard.SelectedConnectors.Count > 1)
+                        {
+                        <div class="btn-wrapper">
+                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.Ready))" disabled="@(SolverWizard.Stage == SolutionStage.Ready)">
+                                Begin Solving
+                            </button>
+                        </div>
+                        }
+                    }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                @switch (SolverWizard.Stage)
+                    {
+                        case SolutionStage.Begin:
+                            {
+                            <p>Setting up the solver 🧙‍♂️ wizard to analyze your problem...</p>
+                            }
+                            break;
+                        case SolutionStage.SetTarget:
+                            {
+                            <ComponentPicker Components="@SolverWizard.Connectors.Where(c=>c.TargetDirectionConnectionType==ConnectionTypes.Terminator).ToList()"
+                                 Title="Choose your target"
+                                 MultiSelect="false"
+                                 InitialSelection="@SelectedTarget"
+                                 OnSelectionChanged="@(components => SolverWizard.SetTarget(components.First()))" />
+                            }
+                            break;
+                        case SolutionStage.SetSensor:
+                            {
+                            <ComponentPicker Components="@SolverWizard.Connectors.Where(c=>c.SensorDirectionConnectionType==ConnectionTypes.Terminator).ToList()"
+                                 Title="Choose your sensor"
+                                 MultiSelect="false"
+                                 InitialSelection="@SelectedSensor"
+                                 OnSelectionChanged="@(components => SolverWizard.SetSensor(components.First()))" />
+                            }
+                            break;
+                        case SolutionStage.SetConnectors:
+                            {
+                            <ComponentPicker Components="@SolverWizard.Connectors.Where(c=>c.TargetDirectionConnectionType!=ConnectionTypes.Terminator && c.SensorDirectionConnectionType != ConnectionTypes.Terminator).ToList()"
+                                 Title="Choose your connectors"
+                                 MultiSelect="true"
+                                 InitialSelection="@SelectedConnectors"
+                                 OnSelectionChanged="@(components => SolverWizard.SetConnectors(components.ToList()))" />
+                            }
+                            break;
+                        case SolutionStage.Running:
+                            <SolutionSummary/>
+                            break;
+                        default: 
+                            break;
+                    }
+            </div>
+        </div>
+    </div>
+</CascadingValue>
+}
+
+@code {
+    private string circleClass(bool on) => on ? "circle green" : "circle red";
+    private Component[] SelectedTarget => SolverWizard.Target == null ? Array.Empty<Component>() : new[] { SolverWizard.Target };
+    private Component[] SelectedSensor => SolverWizard.Sensor == null ? Array.Empty<Component>() : new[] { SolverWizard.Sensor };
+    private Component[] SelectedConnectors => SolverWizard.SelectedConnectors.ToArray();
+
+    protected override void OnInitialized()
     {
-        components = await AppHost.GetComponentsAsync();
-        await base.OnInitializedAsync();
+        Channel.Subscribe<ISolverWizard>(nameof(SolutionStage), (string topic, ISolverWizard? wiz) => InvokeAsync(StateHasChanged));
+        Channel.Subscribe<Box<bool>>(nameof(AppHost.SetBusy), (string topic, Box<bool>? busyStatus) => InvokeAsync(StateHasChanged));
+        base.OnInitialized();
     }
 }

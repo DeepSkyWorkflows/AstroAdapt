@@ -1,0 +1,9 @@
+﻿button {
+    float: left;
+    margin: 1em;
+    width: 20em;
+}
+
+button div {
+    margin-top: 32px;
+}

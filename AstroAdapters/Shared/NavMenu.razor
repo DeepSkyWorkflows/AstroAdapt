@@ -1,4 +1,5 @@
 ﻿@inject IAppHost AppHost
+@inject IStatusLogger StatusLogger
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">🌙 Astro Adapters</a>
@@ -63,12 +64,12 @@
     {
         if (logToConsole)
         {
-            AppHost.OnStatusUpdated -= ConsoleLogger;
+            StatusLogger.OnStatusUpdated -= ConsoleLogger;
             logToConsole = false;            
         }
         else
         {
-            AppHost.OnStatusUpdated += ConsoleLogger;
+            StatusLogger.OnStatusUpdated += ConsoleLogger;
             logToConsole = true;
         }
         var prefs = await AppHost.GetPreferencesAsync();

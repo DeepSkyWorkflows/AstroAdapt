@@ -1,0 +1,23 @@
+﻿div.wrapper {
+    width: 52vw;
+    padding: 1vw;
+    border: solid 2px darkgray;
+    background: lightgray;
+}
+
+div.detail {
+    font-weight: bold;
+    font-size: 0.8em;
+    padding: 1px;
+    margin-top: 0.3em;
+    width: 50vw;
+    text-align: center;
+}
+
+.good {
+    background: lightgreen;
+}
+
+.bad {
+    background: coral;
+}

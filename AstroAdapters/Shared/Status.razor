@@ -1,4 +1,4 @@
-﻿@inject IAppHost AppHost
+﻿@inject IStatusLogger Logger
 @using Timer=System.Timers.Timer
 <div id="status">@status</div>
 
@@ -11,7 +11,7 @@
 
     protected override void OnInitialized()
     {
-        AppHost.OnStatusUpdated += (o, e) => StatusUpdated(e);
+        Logger.OnStatusUpdated += (o, e) => StatusUpdated(e);
         base.OnInitialized();
     }
 
@@ -25,7 +25,7 @@
 
         var now = DateTime.Now.Ticks;
         var diff = now - lastStatusReceived;
-        if (diff < debounceInterval)
+        if (diff < debounceInterval && diff > 0)
         {
             queuedStatus = status;
             tock = new Timer(diff);

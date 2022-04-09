@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AstroAdapt.Data", "AstroAda
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AstroAdapt.Engine", "AstroAdapt.Engine\AstroAdapt.Engine.csproj", "{446C5E86-1766-452D-8A48-6C6B4353F13C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AstroAdapters", "AstroAdapters\AstroAdapters.csproj", "{D5D38B36-A57B-4CE2-94FB-21B4947F88CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AstroAdapters", "AstroAdapters\AstroAdapters.csproj", "{D5D38B36-A57B-4CE2-94FB-21B4947F88CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

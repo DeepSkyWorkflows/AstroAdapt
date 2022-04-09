@@ -1,0 +1,39 @@
+﻿.btn-wrapper {
+    margin-top: 0.3em;
+    float: left;    
+}
+
+.circle {
+    border-radius: 50%;
+    width: 3em;
+    height: 3em;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding-top: 0.5em;
+    text-align: center;
+    vertical-align: top;
+    font-weight: bold;
+    float: left;
+}
+
+.red {
+    background: #ee0000;
+    border: 3px solid #330000;
+    color: #110000;
+}
+
+.green {
+    background: #00ee00;
+    border: 3px solid #003300;
+    color: #001100;
+}
+
+.arrow {
+    margin-top: 0.4em;
+    width: 2em;
+    height: 2em;
+    border: 1em solid;
+    border-color: lightblue transparent transparent lightblue;
+    transform: rotate(135deg);
+    float: left;
+}

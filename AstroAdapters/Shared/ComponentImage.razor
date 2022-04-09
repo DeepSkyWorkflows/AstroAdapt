@@ -1,0 +1,22 @@
+﻿@inject IDataServices DataServices
+@if (Component != null)
+{
+    <img class="card-img-top @size" src="@url" alt="@Component?.ComponentType" />    
+}
+@code {
+    private string size => SmallSize ? "small" : "";
+    private string url = "#";
+
+    [Parameter]
+    public Component? Component { get; set; }
+
+    [Parameter]
+    public bool SmallSize { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        url = await DataServices.ResolveImageAsync(Component ?? new Component());        
+        await base.OnInitializedAsync();
+    }
+
+}

@@ -10,8 +10,10 @@ namespace AstroAdapt.Models
     {
         private static readonly object solutionSync = new();
 
+        private bool delayForUI = false;
         private readonly int workerCount;
         private const byte MASK = 0xFF;
+        private TaskCompletionSource<bool>? solvingDone;
         private readonly Dictionary<Guid, Component> components = new();
         private readonly Dictionary<Guid, byte> bitMap = new();
         private readonly Dictionary<Guid, int> byteMap = new();
@@ -72,17 +74,20 @@ namespace AstroAdapt.Models
         /// <param name="target">The target to solve.</param>
         /// <param name="sensor">The sensor to solve.</param>
         /// <param name="backFocusTolerance">Percentage backfocus can be off.</param>
+        /// <param name="delayForUI">When true adds delays for UI refresh.</param>
         public async Task SolveAsync(
             IEnumerable<Component> inventory,
             Component target,
             Component sensor,
-            double backFocusTolerance = 0.05)
+            double backFocusTolerance = 0.05,
+            bool delayForUI = false)
         {
             if (Solving)
             {
                 throw new InvalidOperationException("Can't start a new solution before the old one finishes.");
             }
 
+            this.delayForUI = delayForUI;
             components.Clear();
             bitMap.Clear();
             byteMap.Clear();
@@ -120,13 +125,10 @@ namespace AstroAdapt.Models
             };
             flags[0] &= 0b11111110; // consume target
 
-            var result = Solve(flags, imageTrain);
-            SolutionChanged?.Invoke(
-                this,
-                new SolutionEventArgs(
-                    this,
-                    SolutionEventTypes.SolverDone,
-                    result));
+            var (result, solution) = Solve(flags, imageTrain);
+            OnSolutionChanged(result, solution);
+
+            solvingDone = new TaskCompletionSource<bool>();
 
             if (workerCount < 1)
             {
@@ -142,8 +144,9 @@ namespace AstroAdapt.Models
                     workers[i] = task;
                     task.Start();
                 }
-                await Task.WhenAll(workers);
             }
+
+            await solvingDone.Task;
 
             Solving = false;
             SolutionChanged?.Invoke(this, new SolutionEventArgs(this, Solutions));
@@ -267,7 +270,7 @@ namespace AstroAdapt.Models
         /// <param name="flags">Current state of available components.</param>
         /// <param name="imageTrain">Current image train.</param>
         /// <returns>The reason for concluding the job.</returns>
-        public SolverResults Solve(
+        public (SolverResults result, Solution? solution) Solve(
             byte[] flags,
             (Guid id, bool reversed)[] imageTrain)
         {
@@ -303,7 +306,7 @@ namespace AstroAdapt.Models
             // does a sensor solution still exist?
             if (!sensorDependencies.And(flagBits).Cast<bool>().Contains(true))
             {
-                return SolverResults.NoSensorConnection;
+                return (SolverResults.NoSensorConnection, null);
             }
 
             var deps = new BitArray(dependencies[rootId].ToArray());
@@ -311,7 +314,7 @@ namespace AstroAdapt.Models
             // does any solution still exist?
             if (!deps.And(flagBits).Cast<bool>().Contains(true))
             {
-                return SolverResults.DeadEnd;
+                return (SolverResults.DeadEnd, null);
             }
 
             // always check for end connection first
@@ -331,7 +334,7 @@ namespace AstroAdapt.Models
 
                 if (deviance > tolerance)
                 {
-                    return SolverResults.OutsideTolerance;
+                    return (SolverResults.OutsideTolerance, null);
                 }
             }
 
@@ -372,7 +375,7 @@ namespace AstroAdapt.Models
                 depResolver = depResolver.RightShift(1);
             }
 
-            return SolverResults.Forked;
+            return (SolverResults.Forked, null);
         }
 
         /// <summary>
@@ -392,23 +395,54 @@ namespace AstroAdapt.Models
         /// <summary>
         /// Worker job to handle parallel processing.
         /// </summary>
-        private void Worker()
+        private async void Worker()
         {
             var workToDo = !SolverQueue.IsEmpty;
+            int iterations = 0;
 
             while (workToDo)
             {
+                iterations++;
+                if (delayForUI && iterations % 10 == 0)
+                {
+                    await Task.Delay(1);
+                }
                 if (SolverQueue.TryDequeue(out var job) && job != null)
                 {
-                    var result = Solve(job.flags, job.solution);
-                    SolutionChanged?.Invoke(
-                        this,
-                        new SolutionEventArgs(
-                            this,
-                            SolutionEventTypes.SolverDone,
-                            result));
+                    var (result, solution) = Solve(job.flags, job.solution);
+                    OnSolutionChanged(result, solution);
+                    
                 }
-                workToDo = !SolverQueue.IsEmpty;
+                workToDo = !SolverQueue.IsEmpty;                
+            }
+
+            if (Solving && !solvingDone.Task.IsCompleted)
+            {
+                solvingDone!.TrySetResult(true);
+            }
+        }
+
+        /// <summary>
+        /// Called to raise solution change event.
+        /// </summary>
+        /// <param name="result">The result.</param>
+        /// <param name="solution">The solution.</param>
+        private void OnSolutionChanged(SolverResults result, Solution? solution)
+        {
+            if (result == SolverResults.Solved)
+            {
+                SolutionChanged?.Invoke(
+                    this,
+                    new SolutionEventArgs(this, solution!));
+            }
+            else
+            {
+                SolutionChanged?.Invoke(
+                    this,
+                    new SolutionEventArgs(
+                        this,
+                        SolutionEventTypes.SolverDone,
+                        result));
             }
         }
 
@@ -417,7 +451,7 @@ namespace AstroAdapt.Models
         /// </summary>
         /// <param name="solution">The <see cref="Solution"/>.</param>
         /// <returns>The result.</returns>
-        private SolverResults Solved(Solution solution)
+        private (SolverResults results, Solution? solution) Solved(Solution solution)
         {
             var tolerance = solution.BackFocusMm * BackFocusTolerance;
             if (solution.Deviance <= tolerance || BackFocusTolerance == 0)
@@ -436,9 +470,9 @@ namespace AstroAdapt.Models
                 {
                     Monitor.Exit(solutionSync);
                 }
-                return dup ? SolverResults.Duplicate : SolverResults.Solved;
+                return dup ? (SolverResults.Duplicate, null) : (SolverResults.Solved, solution);
             }
-            return SolverResults.OutsideTolerance;
+            return (SolverResults.OutsideTolerance, null);
         }
 
         /// <summary>

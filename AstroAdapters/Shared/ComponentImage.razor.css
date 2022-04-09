@@ -1,0 +1,11 @@
+﻿img {    
+    width: 128px;
+    resize: both;
+    float: left;
+    margin: 1em;
+}
+
+img.small {
+    width: 64px;
+    resize: both;
+}

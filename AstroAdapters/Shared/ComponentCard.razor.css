@@ -1,0 +1,31 @@
+﻿div.card {
+    width: 20em;
+    height: 20em;
+    float: left;
+    margin-left: 2em;
+    margin-top: 2em;
+    font-size: 0.8em;
+    border: solid 0.25em lightgray;
+}
+.selectable {
+    cursor: pointer;
+}
+.selectable:hover {
+    border: solid 0.25em gray;
+    background: lightblue;
+}
+.selected {
+    border: solid 0.25em red;
+    background: lightyellow;
+}
+.card-title {
+    text-align: center;
+    border: solid 1px grey;
+    background: lightgray;
+    font-size: 1em;
+    font-weight: bold;
+}
+p {
+    text-align: center;
+    margin: 0.2em;
+}

@@ -2,8 +2,11 @@
 {
     public enum SolutionStage
     {
-        Loading,
-        Configuring,
+        Begin,
+        SetTarget,
+        SetSensor,
+        SetConnectors,
+        Ready,
         Running,
         Solved
     }

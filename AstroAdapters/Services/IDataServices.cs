@@ -1,4 +1,5 @@
 ﻿using AstroAdapt.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace AstroAdapters.Services
 {
@@ -6,6 +7,7 @@ namespace AstroAdapters.Services
     {
         Task<Preferences?> GetPreferencesAsync();
         Task SavePreferencesAsync(Preferences preferences);
-        Task<List<Manufacturer>?> GetManufacturersAsync();        
+        Task<List<Manufacturer>?> GetManufacturersAsync();
+        Task<string> ResolveImageAsync(Component component);
     }
 }
