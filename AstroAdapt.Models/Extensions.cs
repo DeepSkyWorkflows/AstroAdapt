@@ -5,6 +5,53 @@
     /// </summary>
     public static class Extensions
     {
+        private static readonly IDictionary<ConnectionSizes, ConnectionSizes[]> Compatibility =
+            new Dictionary<ConnectionSizes, ConnectionSizes[]>
+            {
+                { ConnectionSizes.Zero, Array.Empty<ConnectionSizes>() },
+                { ConnectionSizes.M12, new [] { ConnectionSizes.M12 } },
+                { ConnectionSizes.CameraLens, new [] { ConnectionSizes.CameraLens } },
+                { ConnectionSizes.LargeSCT325, new [] { ConnectionSizes.LargeSCT325 } },
+                { ConnectionSizes.LargeSCT328, new [] { ConnectionSizes.LargeSCT328 } },
+                { ConnectionSizes.M285x125, new [] { ConnectionSizes.M285x125 } },
+                { ConnectionSizes.M42, new []
+                {
+                    ConnectionSizes.M42,
+                    ConnectionSizes.M42With125Sleeve
+                } },
+                { ConnectionSizes.M42With125Sleeve, new []
+                {
+                    ConnectionSizes.M42,
+                    ConnectionSizes.OneQuarterInchSleeve,
+                    ConnectionSizes.M42With125Sleeve
+                } },
+                { ConnectionSizes.M445, new [] { ConnectionSizes.M445 } },
+                { ConnectionSizes.M48, new [] { ConnectionSizes.M48 } },
+                { ConnectionSizes.M48T, new []
+                {
+                    ConnectionSizes.M48T,
+                    ConnectionSizes.M48WithTwoInchSleeve
+                } },
+                { ConnectionSizes.M48WithTwoInchSleeve, new []
+                {
+                    ConnectionSizes.M48T,
+                    ConnectionSizes.TwoInchSleeve,
+                    ConnectionSizes.M48WithTwoInchSleeve
+                } },
+                { ConnectionSizes.OneQuarterInchSleeve, new []
+                {
+                    ConnectionSizes.M42With125Sleeve,
+                    ConnectionSizes.OneQuarterInchSleeve
+                } },
+                { ConnectionSizes.SmallSCT, new [] { ConnectionSizes.SmallSCT } },
+                {ConnectionSizes.TwoInchSleeve, new []
+                {
+                    ConnectionSizes.M48WithTwoInchSleeve,
+                    ConnectionSizes.TwoInchSleeve
+                } },
+                { ConnectionSizes.Videox1in, new [] { ConnectionSizes.Videox1in } },
+            };
+
         /// <summary>
         /// Checks for compatibility between connection type.
         /// </summary>
@@ -144,28 +191,8 @@
         /// <param name="size">The size.</param>
         /// <param name="otherSize">The size to check.</param>
         /// <returns>A value indicating whether the sizes are compatible.</returns>
-        public static bool IsCompatibleWith(this ConnectionSizes size, ConnectionSizes otherSize)
-        {
-            if (size == ConnectionSizes.Zero || otherSize == ConnectionSizes.Zero)
-            {
-                return false;
-            }
-
-            return size switch
-            {
-                ConnectionSizes.M42With125Sleeve => otherSize == ConnectionSizes.M42With125Sleeve ||
-                                        otherSize == ConnectionSizes.M42 ||
-                                        otherSize == ConnectionSizes.OneQuarterInchSleeve,
-                ConnectionSizes.OneQuarterInchSleeve => otherSize == ConnectionSizes.OneQuarterInchSleeve ||
-otherSize == ConnectionSizes.M42With125Sleeve,
-                ConnectionSizes.M48WithTwoInchSleeve => otherSize == ConnectionSizes.M48WithTwoInchSleeve ||
-otherSize == ConnectionSizes.M48T ||
-otherSize == ConnectionSizes.TwoInchSleeve,
-                ConnectionSizes.TwoInchSleeve => otherSize == ConnectionSizes.TwoInchSleeve ||
-otherSize == ConnectionSizes.M48WithTwoInchSleeve,
-                _ => otherSize == size,
-            };
-        }
+        public static bool IsCompatibleWith(this ConnectionSizes size, ConnectionSizes otherSize) =>
+            Compatibility[size].Contains(otherSize);            
 
         /// <summary>
         /// Convert solution to saved solution.

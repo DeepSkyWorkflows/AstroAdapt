@@ -10,6 +10,8 @@ namespace AstroAdapt.Engine
     /// </summary>
     public class AstroApp : IAstroApp
     {
+        private Action terminate = () => { };
+
         /// <summary>
         /// Initialize instance with defaults.
         /// </summary>
@@ -205,6 +207,7 @@ namespace AstroAdapt.Engine
             }
 
             var sd = new SolutionDomain(workerCount.Value);
+            terminate = () => sd.Cancel();
 
             StatTracker? statTracker = null;
 
@@ -246,6 +249,8 @@ namespace AstroAdapt.Engine
             {
                 sd.SolutionChanged -= handler;
             }
+
+            terminate = () => { };
 
             return sd.GetSolutions();
         }
@@ -300,5 +305,10 @@ namespace AstroAdapt.Engine
             ctx.Solutions.Remove(solutionToDelete);
             await ctx.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// End the current solving run.
+        /// </summary>
+        public void Terminate() => terminate!();
     }
 }

@@ -11,6 +11,11 @@
         Zero,
 
         /// <summary>
+        /// Generic for camera lense adapter
+        /// </summary>
+        CameraLens,
+
+        /// <summary>
         /// M12x0.5 "Webcam"
         /// </summary>
         M12,
@@ -46,6 +51,11 @@
         M48T,
 
         /// <summary>
+        /// M48
+        /// </summary>
+        M48,
+
+        /// <summary>
         /// M48 with 2" sleeve option
         /// </summary>
         M48WithTwoInchSleeve,
@@ -59,7 +69,7 @@
         /// 2" sleeve
         /// </summary>
         TwoInchSleeve,
-
+        
         /// <summary>
         /// 2" SCT thread
         /// </summary>

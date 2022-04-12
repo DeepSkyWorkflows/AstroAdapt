@@ -1,12 +1,13 @@
 ﻿Manufacturer,Model,Type,Target Type,Target Size,Sensor Type,Sensor Size,BF,Length,Threads,Reversible,InsertionPoint,Qty,ShortCode
 ZWO,ASI294MCPro,Sensor,Inserter,M42 ,Terminator,Zero,0,0,6.5,FALSE,FlushToSensor,1,294MC
 ZWO,ASI120MM-S,Sensor,Receiver,M42,Terminator,Zero,0,0,12.5,FALSE,FlushToSensor,1,120MM
-Sony,ILCE-6300,Sensor,Receiver,M42,Terminator,Zero,0,0,55,FALSE,FlushToSensor,1,A6300
-Svbony,SV503 70ED,OTA,Terminator,Zero,Receiver,TwoInchSleeve,55,0,0,FALSE,FlushToTarget,1,SV503
+Sony,ILCE-6300,Sensor,Receiver,CameraLens,Terminator,Zero,0,0,18.5,FALSE,FlushToSensor,1,A6300
+Svbony,SV503 70ED,OTA,Terminator,Zero,Receiver,M48T,55,0,0,FALSE,FlushToTarget,1,SV503
 Celestron,EdgeHD 9.25,OTA,Terminator,Zero,Inserter,LargeSCT325,146.5,0,0,FALSE,FlushToTarget,1,EDGE925
-Svbony,SV106 50,OTA,Terminator,Zero,Receiver,OneQuarterInchSleeve,55,0,0,FALSE,FlushToTarget,1,SV106
-Celestron,Visual Back Sleeve,VisualBack,Receiver,LargeSCT325,Receiver,OneQuarterInchSleeve,0,91,0,FALSE,FlushToTarget,1,SCT325M42
-Celestron,Visual Back T2 M42,VisualBack,Receiver,LargeSCT325,Inserter,M42 ,0,91,0,FALSE,FlushToTarget,1,SCT325Sleeve
+Fotasy,Emount Adpater,Adapter,Receiver,M42,Inserter,CameraLens,0,35.5,0,FALSE,FlushToSensor,1,CAMADAPT
+Svbony,SV106 50,OTA,Terminator,Zero,Receiver,M48T,55,0,0,FALSE,FlushToTarget,1,SV106
+Celestron,Visual Back Sleeve,VisualBack,Receiver,LargeSCT325,Receiver,OneQuarterInchSleeve,0,91,0,FALSE,FlushToTarget,1,SCT325Sleeve
+Celestron,Visual Back T2 M42,VisualBack,Receiver,LargeSCT325,Inserter,M42 ,0,91,0,FALSE,FlushToTarget,1,SCT325M42
 Generic,M42 M-M 2,Adapter,Inserter,M42 ,Inserter,M42 ,0,2,0,TRUE,NoPreference,1,M42MM2
 Generic,M42 M-F 5,Adapter,Receiver,M42 ,Inserter,M42 ,0,5,0,TRUE,NoPreference,1,M42MF5
 Generic,M42 F-F 11,Adapter,Receiver,M42 ,Receiver,M42 ,0,11,0,TRUE,NoPreference,1,M42FF11
@@ -15,18 +16,22 @@ Generic,M42 M-F 16,Adapter,Receiver,M42 ,Inserter,M42 ,0,16,0,TRUE,NoPreference,
 Generic,M42 M-F 20,Adapter,Receiver,M42 ,Inserter,M42 ,0,20,0,TRUE,NoPreference,1,M42MF20
 Generic,M42 M-F 21,Adapter,Receiver,M42 ,Inserter,M42 ,0,21,0,TRUE,NoPreference,1,M42MF21
 Generic,M42 Nosepiece,NosePiece,Inserter,M42,Inserter,OneQuarterInchSleeve,0,1,0,TRUE,NoPreference,3,M42Nose
-Generic,M48 M-F 5,Adapter,Receiver,M48T,Inserter,M48T,0,5,0,TRUE,NoPreference,1,M48TMF5
-Generic,M48 M-F 10,Adapter,Receiver,M48T,Inserter,M48T,0,10,0,TRUE,NoPreference,1,M48TMF10
-Generic,M48 M-F 16.5,Adapter,Receiver,M48T,Inserter,M48T,0,16.5,0,TRUE,NoPreference,1,M48TMF16.5
-Generic,M48 M-F 20,Adapter,Receiver,M48T,Inserter,M48T,0,20,0,TRUE,NoPreference,1,M48TMF20
-Generic,M48 M-F 30,Adapter,Receiver,M48T,Inserter,M48T,0,30,0,TRUE,NoPreference,2,M48TMF30
-Generic,M48F M42M 7,Adapter,Receiver,M48T,Inserter,M42,0,7,0,TRUE,NoPreference,1,M48TMM7
-Generic,M48M M42F 30,Adapter,Inserter,M48T,Receiver,M42,0,30,0,TRUE,NoPreference,1,M48TMF30
-Generic,2 in. 15mm Compression Ring,CompressionRing,Inserter,TwoInchSleeve,Dual,M48WithTwoInchSleeve,0,15,0,FALSE,FlushToTarget,1,2in15mmRing
-Generic,2 in. to M48 35mm Compression Ring,CompressionRing,Dual,M48WithTwoInchSleeve,Receiver,OneQuarterInchSleeve,0,35,0,FALSE,FlushToTarget,1,2in35mmRing
-Generic,2 in. to M48 30mm Compression Ring,CompressionRing,Dual,M48WithTwoInchSleeve,Receiver,OneQuarterInchSleeve,0,30,0,FALSE,FlushToTarget,1,2in30mmRing
-Generic,1.25 M42 Compression Ring 30mm,CompressionRing,Receiver,M42 ,Receiver,OneQuarterInchSleeve,0,30,0,FALSE,NoPreference,1,125M42Ring
+Generic,M48 M-F 5,Adapter,Receiver,M48,Inserter,M48,0,5,0,TRUE,NoPreference,1,M48TMF5
+Generic,M48 M-F 10,Adapter,Receiver,M48,Inserter,M48,0,10,0,TRUE,NoPreference,1,M48TMF10
+Generic,M48 M-F 16.5,Adapter,Receiver,M48,Inserter,M48,0,16.5,0,TRUE,NoPreference,1,M48TMF16.5
+Generic,M48 M-F 20,Adapter,Receiver,M48,Inserter,M48,0,20,0,TRUE,NoPreference,1,M48TMF20
+Generic,M48 M-F 30,Adapter,Receiver,M48,Inserter,M48,0,30,0,TRUE,NoPreference,2,M48TMF30
+Generic,M48F M42M 7,Adapter,Receiver,M48,Inserter,M42,0,7,0,TRUE,NoPreference,1,M48TMM7
+Generic,M48M M42F 30,Adapter,Inserter,M48,Receiver,M42,0,30,0,TRUE,NoPreference,1,M48TMF30
+Generic,M48 to 2inSleeve,Adapter,Inserter,M48,Inserter,TwoInchSleeve,0,30,0,TRUE,NoPreference,1,M48to2In
+Generic,2 in. 15mm Compression Ring,CompressionRing,Receiver,TwoInchSleeve,Inserter,M48T,0,15,0,TRUE,FlushToTarget,1,2in15mmRing
+Generic,"M48 to 1.25"" Sleeve",CompressionRing,Receiver,M48,Receiver,OneQuarterInchSleeve,0,28,4,TRUE,NoPreference,1,28mmRing
+Generic,"M48 to 1.25"" Sleeve",CompressionRing,Receiver,M48,Receiver,OneQuarterInchSleeve,0,30,0,TRUE,NoPreference,1,30mmRing
+Generic,"2"" to 1.25"" Sleeve",CompressionRing,Inserter,TwoInchSleeve,Receiver,OneQuarterInchSleeve,0,28,4,TRUE,NoPreference,1,28mmRing
+Generic,"2"" to 1.25"" Sleeve",CompressionRing,Inserter,TwoInchSleeve,Receiver,OneQuarterInchSleeve,0,30,0,TRUE,NoPreference,1,30mmRing
 Generic,M42 to 1.25in 21,Adapter,Inserter,M42 ,Receiver,OneQuarterInchSleeve,0,21,0,TRUE,NoPreference,1,M42toin21
 ZWO,5 filter 1.25in Electronic Filter Wheel,FilterWheel,Receiver,M42 ,Receiver,M42,0,20,0,TRUE,FlushToSensor,1,EFW
-Zhumell,2x Barlow,Barlow,Receiver,M48T,Inserter,M48T,0,24,0,FALSE,NoPreference,1,Barlow
-Zhumell,Barlow extender,Adapter,Receiver,M48T,Inserter,TwoInchSleeve,0,41,0,TRUE,NoPreference,1,Extender
+Zhumell,2x Barlow,Barlow,Receiver,M48,Inserter,M48,0,23,0,FALSE,NoPreference,1,Barlow
+Zhumell,Barlow Ring,CompressionRing,Receiver,M48T,Receiver,M48WithTwoInchSleeve,0,50,0,TRUE,NoPreference,1,2inRing
+Zhumell,Barlow Extensions,Adapter,Receiver,M48,Inserter,M48T,0,40,0,TRUE,NoPreference,1,BarlowExt
+Zhmell,Barlow Assembly,Other,Receiver,M48,Receiver,TwoInchSleeve,0,113,0,FALSE,PreferTarget,1,BarlowKit

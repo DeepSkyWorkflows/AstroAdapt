@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Text.Json;
 using System.Text;
 using AstroAdapt.Data;
 using AstroAdapt.Engine;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 var refreshRateMs = TimeSpan.FromMilliseconds(1000).Ticks;
 var lastTick = DateTime.Now.Ticks;
 object statusContext = new();
+Solution? lastSolution = null; 
 
 Console.WriteLine("Example solver.");
 Console.WriteLine("Initializing engine...");
@@ -88,7 +88,8 @@ foreach (var target in targets)
             sensor,
             selectedConnectors,
             backFocusTolerance,
-            SolutionUpdate);
+            SolutionUpdate,
+            GrabLastSolution);
 
         var span = DateTime.Now - now;
 
@@ -256,6 +257,14 @@ if (solutionsToSave.Count > 0)
     }
 }
 
+void GrabLastSolution(SolutionEventArgs e)
+{
+    if (e.Solution != null)
+    {
+        lastSolution = e.Solution;
+    }
+}
+
 void SolutionUpdate(StatTracker tracker)
 {
     if (DateTime.Now.Ticks - lastTick < refreshRateMs)
@@ -266,15 +275,24 @@ void SolutionUpdate(StatTracker tracker)
     try
     {
         Console.SetCursorPosition(1, 1);
+        Console.WriteLine("Press any key to terminate");
         foreach (var type in StatTracker.AvailableResultTypes)
         {
             Console.Write($"{type}\t{tracker[type]}\t");
             Console.WriteLine();
         }
+        if (lastSolution != null)
+        {
+            Console.WriteLine(lastSolution.ToShortString());
+        }
     }
     finally
     {
-        Monitor.Exit(statusContext);
+        Monitor.Exit(statusContext);        
+    }
+    if (Console.KeyAvailable)
+    {
+        engine.Terminate();
     }
     lastTick = DateTime.Now.Ticks;
 }

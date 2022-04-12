@@ -151,6 +151,11 @@ namespace AstroAdapt.Engine
             long correlationId = 0);
 
         /// <summary>
+        /// Terminate the current run.
+        /// </summary>
+        void Terminate();
+
+        /// <summary>
         /// Gets or sets the path to images.
         /// </summary>
         string PathToImages { get; }
