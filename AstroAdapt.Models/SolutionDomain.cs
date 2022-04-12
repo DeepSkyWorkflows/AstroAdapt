@@ -292,6 +292,13 @@ namespace AstroAdapt.Models
                 components[rootId].Clone().Reverse() :
                 components[rootId];
 
+            // always check for end connection first
+            if (newComponent.IsCompatibleWith(configuration!.Sensor).isCompatible)
+            {
+                Spawn(new SolverJob(
+                    flags.ToArray(), imageTrain.Union(new[] { (configuration!.Sensor.Id, false) }).ToArray()));
+            }
+
             // remove from inventory
             flags[byteMap[rootId]] &= (byte)(MASK ^ bitMap[rootId]);
 
@@ -312,13 +319,6 @@ namespace AstroAdapt.Models
                 || !deps.And(flagBits).Cast<bool>().Contains(true))
             {
                 return (SolverResults.DeadEnd, null);
-            }
-
-            // always check for end connection first
-            if (newComponent.IsCompatibleWith(configuration!.Sensor).isCompatible)
-            {
-                Spawn(new SolverJob(
-                    flags.ToArray(), imageTrain.Union(new[] { (configuration!.Sensor.Id, false) }).ToArray()));
             }
 
             if (configuration!.BackFocusTolerance != 0 && imageTrain.Length > 0)
