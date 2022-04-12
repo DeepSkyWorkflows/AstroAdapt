@@ -21,6 +21,8 @@ namespace AstroAdapters.Services
         public long Solved { get; private set; }
         public TimeSpan RunningTime => DateTime.Now - started;
 
+        public Solution? LastSolution { get; set; }
+
         public List<Solution> Solutions { get; private set; } = new List<Solution>();
 
         public SolverStats(Component target, Component sensor)
@@ -30,7 +32,7 @@ namespace AstroAdapters.Services
         }
 
         public void Refresh(StatTracker stats)
-        {
+        {            
             Solved = stats[SolverResults.Solved];
             TotalAttempts = stats[SolverResults.Info];
             ForkedSolutions = stats[SolverResults.Forked];

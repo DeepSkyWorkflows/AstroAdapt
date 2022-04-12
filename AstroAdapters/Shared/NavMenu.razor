@@ -50,6 +50,10 @@
     {
         var prefs = await AppHost.GetPreferencesAsync();
         logToConsole = prefs.LogToConsole;
+        if (logToConsole)
+        {
+            StatusLogger.OnStatusUpdated += ConsoleLogger;
+        }
         await base.OnInitializedAsync();
     }
 

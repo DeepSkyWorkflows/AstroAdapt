@@ -10,13 +10,16 @@
         {
             if (subscribers.ContainsKey(typeof(T)))
             {
-                if (subscribers[typeof(T)].ContainsKey(topic))
-                {
-                    foreach (var subscriber in subscribers[typeof(T)][topic])
+                foreach (var topicToCheck in new[] { string.Empty, topic })
+                { 
+                    if (subscribers[typeof(T)].ContainsKey(topicToCheck))
                     {
-                        subscriber(topic, payload);
-                    }
-                }
+                        foreach (var subscriber in subscribers[typeof(T)][topicToCheck])
+                        {
+                            subscriber(topic, payload);
+                        }
+                    }                    
+                }                
             }
         }
 

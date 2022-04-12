@@ -81,6 +81,18 @@ else
                 @Stats.AbortedNoSensor
             </div>
         </div>
+
+        <div class="stat">
+            <div class="label">
+                Stop solving
+            </div>
+            <div class="value red">
+                <button class="btn btn-danger" @onclick="@(() => Cancel())">
+                    End process
+                </button>
+            </div>
+        </div>
+
     }
 }
 @code {
@@ -93,4 +105,6 @@ else
         Channel.Subscribe<ISolverWizard>(nameof(SolutionStage), (topic, stage) => InvokeAsync(StateHasChanged));
         return base.OnInitializedAsync();
     }
+
+    private void Cancel() => Channel.Publish<StatTracker>(nameof(Cancel), null);    
 }

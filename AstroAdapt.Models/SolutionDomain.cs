@@ -10,7 +10,9 @@ namespace AstroAdapt.Models
     {
         private static readonly object solutionSync = new();
 
-        private bool delayForUI = false;
+        private SolverConfiguration? configuration;
+
+        private bool cancel;
         private readonly int workerCount;
         private const byte MASK = 0xFF;
         private TaskCompletionSource<bool>? solvingDone;
@@ -29,11 +31,6 @@ namespace AstroAdapt.Models
         /// </summary>
         private readonly ConcurrentQueue<SolverJob> SolverQueue = new();
 
-        private Component? Target { get; set; }
-
-        private Component? Sensor { get; set; }
-
-        private double BackFocusTolerance { get; set; }
         /// <summary>
         /// Instantiates a new instance of the solution domain.
         /// </summary>
@@ -70,59 +67,48 @@ namespace AstroAdapt.Models
         /// <summary>
         /// Solve the connections.
         /// </summary>
-        /// <param name="inventory">Available adapters for solutions.</param>
-        /// <param name="target">The target to solve.</param>
-        /// <param name="sensor">The sensor to solve.</param>
-        /// <param name="backFocusTolerance">Percentage backfocus can be off.</param>
-        /// <param name="delayForUI">When true adds delays for UI refresh.</param>
+        /// <param name="config">The configuration.</param>
         public async Task SolveAsync(
-            IEnumerable<Component> inventory,
-            Component target,
-            Component sensor,
-            double backFocusTolerance = 0.05,
-            bool delayForUI = false)
+            SolverConfiguration config)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
             if (Solving)
             {
                 throw new InvalidOperationException("Can't start a new solution before the old one finishes.");
             }
 
-            this.delayForUI = delayForUI;
+            config.Validate();
+
+            configuration = config;
+
             components.Clear();
             bitMap.Clear();
             byteMap.Clear();
             dependencies.Clear();
-
-            BackFocusTolerance = backFocusTolerance;
-            Target = target;
-            Sensor = sensor;
-
-            if (inventory == null
-                || !inventory.Any()
-                || target == null
-                || sensor == null)
-            {
-                throw new InvalidOperationException("Nothing to do!");
-            }
 
             Solving = true;
 
             Solutions.Clear();
             SolverQueue.Clear();
 
-            components.Add(target.Id, target);
-            foreach (var component in inventory)
+            components.Add(config.Target!.Id, config.Target);
+            foreach (var component in config.Connections!)
             {
                 components.Add(component.Id, component);
             }
-            components.Add(sensor.Id, sensor);
+            components.Add(config.Sensor!.Id, config.Sensor);
             var flags = Init(components.Values);
             BuildDependencies(components.Values);
 
             var imageTrain = new[]
             {
-                (target.Id, false)
+                (config.Target!.Id, false)
             };
+
             flags[0] &= 0b11111110; // consume target
 
             var (result, solution) = Solve(flags, imageTrain);
@@ -151,6 +137,11 @@ namespace AstroAdapt.Models
             Solving = false;
             SolutionChanged?.Invoke(this, new SolutionEventArgs(this, Solutions));
         }
+
+        /// <summary>
+        /// Cancel the operation. Will provide partial results.
+        /// </summary>
+        public void Cancel() => cancel = true;
 
         /// <summary>
         /// Initialize the bit-mapping for computing permutations.
@@ -202,7 +193,7 @@ namespace AstroAdapt.Models
         {
             var totalBytes = ((components.Count() - 1) >> 3) + 1;
             var deps = new byte[totalBytes];
-            var sensor = component.Equals(Sensor);
+            var sensor = component.Equals(configuration!.Sensor);
 
             // to short circuit some solutions, we figure out which components can connect to the
             // sensor. If they are all in use, then there is no path to success. So this checks
@@ -220,9 +211,9 @@ namespace AstroAdapt.Models
 
                 if (sensor)
                 {
-                    if (option.IsCompatibleWith(Sensor!).isCompatible ||
+                    if (option.IsCompatibleWith(configuration.Sensor!).isCompatible ||
                         (option.IsReversible && option.Clone().Reverse()
-                        .IsCompatibleWith(Sensor!).isCompatible))
+                        .IsCompatibleWith(configuration.Sensor!).isCompatible))
                     {
 
                         deps[byteMap[option.Id]] |= bitMap[option.Id];
@@ -274,15 +265,20 @@ namespace AstroAdapt.Models
             byte[] flags,
             (Guid id, bool reversed)[] imageTrain)
         {
-            if (imageTrain[^1].id == Sensor!.Id) // made it to the end
+            if (cancel)
+            {
+                return (SolverResults.Cancelled, null);
+            }
+
+            if (imageTrain[^1].id == configuration!.Sensor!.Id) // made it to the end
             {
                 var solution = new Solution
                 {
-                    Target = Target!,
-                    Sensor = Sensor!,
-                    BackFocusMm = Target!.BackFocusMm,
+                    Target = configuration!.Target!,
+                    Sensor = configuration!.Sensor!,
+                    BackFocusMm = configuration!.Target!.BackFocusMm,
                     LengthMm = imageTrain.Skip(1).Sum(c => components[c.id].LengthMm)
-                    + Target.ThreadRecessMm + Sensor.ThreadRecessMm,
+                    + configuration!.Target.ThreadRecessMm + configuration!.Sensor.ThreadRecessMm,
                     Connections = imageTrain.Select(c => c.reversed ?
                     components[c.id].Clone().Reverse() :
                     components[c.id]).ToList(),
@@ -312,25 +308,26 @@ namespace AstroAdapt.Models
             var deps = new BitArray(dependencies[rootId].ToArray());
 
             // does any solution still exist?
-            if (!deps.And(flagBits).Cast<bool>().Contains(true))
+            if ((configuration.MaxConnectors > 0 && imageTrain.Length >= configuration.MaxConnectors)
+                || !deps.And(flagBits).Cast<bool>().Contains(true))
             {
                 return (SolverResults.DeadEnd, null);
             }
 
             // always check for end connection first
-            if (newComponent.IsCompatibleWith(Sensor).isCompatible)
+            if (newComponent.IsCompatibleWith(configuration!.Sensor).isCompatible)
             {
                 Spawn(new SolverJob(
-                    flags.ToArray(), imageTrain.Union(new[] { (Sensor.Id, false) }).ToArray()));
+                    flags.ToArray(), imageTrain.Union(new[] { (configuration!.Sensor.Id, false) }).ToArray()));
             }
 
-            if (BackFocusTolerance != 0 && imageTrain.Length > 0)
+            if (configuration!.BackFocusTolerance != 0 && imageTrain.Length > 0)
             {
-                var tolerance = Target!.BackFocusMm * BackFocusTolerance;
+                var tolerance = configuration!.Target!.BackFocusMm * configuration!.BackFocusTolerance;
                 var length = imageTrain.Skip(1).Sum(c => components[c.id].LengthMm)
-                    + Target.ThreadRecessMm + Sensor.ThreadRecessMm;
+                    + configuration!.Target.ThreadRecessMm + configuration!.Sensor.ThreadRecessMm;
 
-                var deviance = length - Target.BackFocusMm;
+                var deviance = length - configuration!.Target.BackFocusMm;
 
                 if (deviance > tolerance)
                 {
@@ -403,22 +400,55 @@ namespace AstroAdapt.Models
             while (workToDo)
             {
                 iterations++;
-                if (delayForUI && iterations % 10 == 0)
+                if (configuration!.DelayForUI && iterations % 10 == 0)
                 {
                     await Task.Delay(1);
                 }
+
                 if (SolverQueue.TryDequeue(out var job) && job != null)
                 {
+                    workToDo = !SolverQueue.IsEmpty;
+
+                    if (configuration.StopAfterNSolutions > 0
+                        && Solutions.Count >= configuration.StopAfterNSolutions)
+                    {
+                        continue;
+                    }
+
+                    if (configuration.StopAfterNPerfectSolutions > 0
+                        && Solutions.Where(s => s.Deviance == 0).Count() >= configuration.StopAfterNPerfectSolutions)
+                    {
+                        continue;
+                    }
+
+                    if (cancel)
+                    {
+                        continue;
+                    }
+
                     var (result, solution) = Solve(job.flags, job.solution);
                     OnSolutionChanged(result, solution);
-                    
                 }
-                workToDo = !SolverQueue.IsEmpty;                
+                else
+                {
+                    workToDo = !SolverQueue.IsEmpty;
+                }
             }
 
-            if (Solving && !solvingDone.Task.IsCompleted)
+            if (Solving && !(solvingDone!.Task.IsCompleted))
             {
-                solvingDone!.TrySetResult(true);
+                Monitor.Enter(solutionSync);
+                try
+                {
+                    if (Solving && !(solvingDone!.Task.IsCompleted))
+                    {
+                        solvingDone!.TrySetResult(true);
+                    }
+                }
+                finally
+                {
+                    Monitor.Exit(solutionSync); 
+                }
             }
         }
 
@@ -453,8 +483,8 @@ namespace AstroAdapt.Models
         /// <returns>The result.</returns>
         private (SolverResults results, Solution? solution) Solved(Solution solution)
         {
-            var tolerance = solution.BackFocusMm * BackFocusTolerance;
-            if (solution.Deviance <= tolerance || BackFocusTolerance == 0)
+            var tolerance = solution.BackFocusMm * configuration!.BackFocusTolerance;
+            if (solution.Deviance <= tolerance || configuration!.BackFocusTolerance == 0)
             {
                 solution.Weight = ComputeWeight(solution);
                 solution.Signature = ComputeSignature(solution);

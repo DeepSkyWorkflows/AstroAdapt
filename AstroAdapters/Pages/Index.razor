@@ -14,11 +14,15 @@ else
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    @if (SolverWizard.Stage == SolutionStage.Ready || SolverWizard.Stage == SolutionStage.Running)
+                    @if (SolverWizard.Stage == SolutionStage.Solved)
                     {
-                        <SolverDashboard Stats="@SolverWizard.Stats"/>
+                     <SolutionsBrowser Solutions="@SolverWizard.Solutions"/>
                     }
-                    else
+                    else if (SolverWizard.Stage == SolutionStage.Ready || SolverWizard.Stage == SolutionStage.Running)
+                    {
+                    <SolverDashboard Stats="@SolverWizard.Stats" />
+                    }
+                    else if (SolverWizard.Stage != SolutionStage.Solved)
                     {
                     <div class="@circleClass(SolverWizard.Target != null)">1</div>
                     <span>&nbsp;</span>
@@ -79,6 +83,12 @@ else
                     }
             </div>
         </div>
+        @if (SolverWizard.Stage == SolutionStage.SetTarget
+        || SolverWizard.Stage == SolutionStage.SetSensor
+        || SolverWizard.Stage == SolutionStage.SetConnectors)
+            {
+            <SolverParameters />
+            }
         <div class="row">
             <div class="col-12">
                 @switch (SolverWizard.Stage)
@@ -116,9 +126,9 @@ else
                             }
                             break;
                         case SolutionStage.Running:
-                            <SolutionSummary/>
+                        <SolutionSummary />
                             break;
-                        default: 
+                        default:
                             break;
                     }
             </div>

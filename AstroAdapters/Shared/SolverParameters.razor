@@ -1,0 +1,282 @@
+﻿@inject ISolverWizard SolverWizard
+@inject IChannel Channel
+<div class="row">
+    <div class="col-12">
+
+        <div class="stat">
+            <div class="label">Ignore backfocus?</div>
+            <div class="value">
+                <input type="checkbox" @bind-value="@IgnoreBackfocus" />
+                Ignore
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">Backfocus Tolerance @Tolerance</div>
+            @if (SolverWizard.Target != null)
+            {
+                <div class="value">
+                    0
+                    <input type="range" min="0" max="100" @bind-value="@BackfocusTolerance" @bind-value:event="onchange" />
+                    @MaxBackfocusRange
+                </div>
+                <div class="value">
+                    @if (Scale == 1)
+                    {
+                        <span>1&nbsp;</span>
+                    }
+                    else
+                    {
+                        <button class="btn-link" @onclick="@(() => Scale = 1)">1</button>
+                        <span>&nbsp;</span>
+                    }
+                    @if (Scale == 2)
+                    {
+                        <span>2&nbsp;</span>
+                    }
+                    else
+                    {
+                        <button class="btn-link" @onclick="@(() => Scale = 2)">2</button>
+                        <span>&nbsp;</span>
+                    }
+                    @if (Scale == 3)
+                    {
+                        <span>3&nbsp;</span>
+                    }
+                    else
+                    {
+                        <button class="btn-link" @onclick="@(() => Scale = 3)">3</button>
+                        <span>&nbsp;</span>
+                    }
+                    @if (Scale == 4)
+                    {
+                        <span>4&nbsp;</span>
+                    }
+                    else
+                    {
+                        <button class="btn-link" @onclick="@(() => Scale = 4)">4</button>
+                        <span>&nbsp;</span>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="stat">
+            <div class="label">Max Connections (@(RangeValue(MaxConnections))</div>
+            @if (SolverWizard.SelectedConnectors.Count > 2)
+            {
+                <div class="value">
+                    <span>0&nbsp;</span>
+                    <input type="range" min="0" max="@MaxConnectionsRange" @bind-value="@MaxConnections" @bind-value:event="oninput" />
+                    <span>@MaxConnectionsRange</span>
+                </div>
+            }
+        </div>
+
+        <div class="stat">
+            <div class="label">Stop After @(RangeValue(MaxSolutions)) Solutions Found</div>
+            <div class="value">
+                <span>0&nbsp;</span>
+                <input type="range" min="0" max="1000" @bind-value="@MaxSolutions" @bind-value:event="oninput" />
+                <span>1000</span>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">Stop After @(RangeValue(MaxPerfectSolutions)) Perfect Solutions Found</div>
+            <div class="value">
+                <span>0&nbsp;</span>
+                <input type="range" min="0" max="1000" @bind-value="@MaxPerfectSolutions" @bind-value:event="oninput" />
+                <span>1000</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+@code {
+    private double backFocusToleranceMm;
+    private double savedToleranceMm;
+    private int backfocusScale = 1;
+    private bool ignoreBackfocus = false;
+    private int maxSolutions;
+    private int maxPerfectSolutions;
+    private int maxConnections;
+
+    private string RangeValue(int value) => value == 0 ? "Unlimited" : value.ToString();
+
+    private string MaxBackfocusRange
+    {
+        get
+        {
+            switch(backfocusScale)
+            {
+                case 1:
+                    return "0.001";
+                case 2:
+                    return "0.01";
+                case 3:
+                    return "0.1";
+                default:
+                    return "1";
+            }
+        }
+    }
+
+    private string Tolerance
+    {
+        get
+        {
+            if (backFocusToleranceMm == 0)
+            {
+                return string.Empty;
+            }
+            var pct = $"{backFocusToleranceMm * 100}%";
+            var range = string.Empty;
+            if (SolverWizard.Target != null)
+            {
+                var bf = SolverWizard.Target.BackFocusMm;
+                var deviation = bf * backFocusToleranceMm;
+                var min = bf - deviation;
+                var max = bf + deviation;
+                range = $"{min}mm to {max}mm";
+            }
+            return $"{pct} {range}";
+        }
+    }
+
+    private bool IgnoreBackfocus
+    {
+        get => ignoreBackfocus;
+        set
+        {
+            ignoreBackfocus = value;
+            if (ignoreBackfocus)
+            {
+                backFocusToleranceMm = 0;
+            }
+            else
+            {
+                backFocusToleranceMm = savedToleranceMm;
+            }
+            SolverWizard.BackfocusTolerance = backFocusToleranceMm;
+        }
+    }
+
+    private double BackfocusTolerance
+    {
+        get
+        {
+            switch (backfocusScale)
+            {
+                case 1:
+                    return backFocusToleranceMm * 100000;
+                case 2:
+                    return backFocusToleranceMm * 10000;
+                case 3:
+                    return backFocusToleranceMm * 1000;
+                default:
+                    return backFocusToleranceMm * 100;
+            }
+        }
+        set
+        {
+            if (value == 0)
+            {
+                ignoreBackfocus = true;
+                backFocusToleranceMm = 0;
+                SolverWizard.BackfocusTolerance = 0;
+                savedToleranceMm = 0;
+            }
+            else if (value > 0)
+            {
+                ignoreBackfocus = false;
+                backFocusToleranceMm = value;
+                switch (backfocusScale)
+                {
+                    case 1:
+                        backFocusToleranceMm /= 100000;
+                        break;
+                    case 2:
+                        backFocusToleranceMm /= 10000;
+                        break;
+                    case 3:
+                        backFocusToleranceMm /= 1000;
+                        break;                    
+                    default:
+                        backFocusToleranceMm /= 100;
+                        break;
+                }
+                SolverWizard.BackfocusTolerance = value;
+                savedToleranceMm = value;
+            }
+        }
+    }
+
+    private int Scale
+    {
+        get => backfocusScale;
+        set
+        {
+            if (value >= 1 && value <= 4)
+            {
+                backfocusScale = value;
+            }
+        }
+    }
+
+    private int MaxConnectionsRange => SolverWizard.SelectedConnectors.Count > 2
+        ? SolverWizard.SelectedConnectors.Count - 1
+        : 0;
+
+    private int MaxConnections
+    {
+        get => maxConnections;
+        set
+        {
+            maxConnections = value;
+            if (maxConnections == 0
+             || (maxConnections > 1
+             && maxConnections < SolverWizard.SelectedConnectors.Count))
+            {
+                SolverWizard.MaxConnectors = maxConnections;
+            }
+        }
+    }
+
+    private int MaxSolutions
+    {
+        get => maxSolutions;
+        set
+        {
+            maxSolutions = value;
+            if (maxSolutions >= 0)
+            {
+                SolverWizard.StopAfterNSolutions = maxSolutions;
+            }
+        }
+    }
+
+    private int MaxPerfectSolutions
+    {
+        get => maxPerfectSolutions;
+        set
+        {
+            maxPerfectSolutions = value;
+            if (maxPerfectSolutions >= 0)
+            {
+                SolverWizard.StopAfterNPerfectSolutions = maxPerfectSolutions;
+            }
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        backFocusToleranceMm = SolverWizard.BackfocusTolerance;
+        ignoreBackfocus = backFocusToleranceMm == 0;
+        maxConnections = SolverWizard.MaxConnectors;
+        maxSolutions = SolverWizard.StopAfterNSolutions;
+        maxPerfectSolutions = SolverWizard.StopAfterNPerfectSolutions;
+        Channel.Subscribe<ISolverWizard>(string.Empty, (topic, stage) => InvokeAsync(StateHasChanged));
+        base.OnInitialized();
+    }
+}

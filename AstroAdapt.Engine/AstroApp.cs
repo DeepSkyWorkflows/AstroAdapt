@@ -228,7 +228,14 @@ namespace AstroAdapt.Engine
                 sd.SolutionChanged += handler;
             }
 
-            await sd.SolveAsync(adapters, target, sensor, backFocusTolerance);
+            var configuration = new SolverConfigurationBuilder()
+                .FromTarget(target)
+                .ToSensor(sensor)
+                .UsingConnections(adapters)
+                .WithBackfocusToleranceOf(backFocusTolerance)
+                .Configuration;
+
+            await sd.SolveAsync(configuration);
 
             if (statTracker != null)
             {

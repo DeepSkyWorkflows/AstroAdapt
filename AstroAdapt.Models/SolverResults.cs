@@ -36,6 +36,11 @@
         Duplicate,
 
         /// <summary>
+        /// A cancellation request was sent.
+        /// </summary>
+        Cancelled,
+
+        /// <summary>
         /// The problem was solved within tolerances.
         /// </summary>
         Solved,

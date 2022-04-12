@@ -1,7 +1,17 @@
 ﻿@inject ISolverWizard SolverWizard
 @inject IChannel Channel
 
-<h3>Top 10 Solutions</h3>
+<h3>Most recent solution</h3>
+@if (SolverWizard.LastSolution != null)
+{
+    <div class="container-fluid">
+        @foreach(var component in SolverWizard.LastSolution.Connections)
+        {
+            <ComponentImage Component="@component" SmallSize="true"/>@component.ShortCode<span>&nbsp;</span>
+        }
+    </div>
+}
+<h3>Top 10 solutions</h3>
 <div class="wrapper">
 @foreach(var solution in SolverWizard.Stats!.Solutions.OrderByDescending(s => s.Weight).Take(10))
 {

@@ -13,9 +13,7 @@ namespace AstroAdapters.Services
         private SolutionDomain? sd;
         private SolutionStage stage;
         
-        private SolverStats? stats;
-
-        
+        private SolverStats? stats;        
         public SolutionStage Stage
         {
             get => stage;
@@ -29,6 +27,14 @@ namespace AstroAdapters.Services
             }
         }
 
+        public double BackfocusTolerance { get; set; } = 0.001;
+
+        public int StopAfterNSolutions { get; set; } = 200;
+
+        public int StopAfterNPerfectSolutions { get; set; } = 100;
+
+        public int MaxConnectors { get; set; }
+
         public Component? Target { get; private set; }
 
         public Component? Sensor { get; private set; }
@@ -38,6 +44,8 @@ namespace AstroAdapters.Services
         public IList<Component> SelectedConnectors { get; private set; } = new List<Component>();
 
         public IList<Solution> Solutions { get; private set; } = new List<Solution>();
+
+        public Solution? LastSolution { get; set; }
 
         public SolverStats? Stats => stats;
 
@@ -56,7 +64,8 @@ namespace AstroAdapters.Services
         public void SetConnectors(IList<Component> connectors)
         {
             SelectedConnectors.Clear();
-            ((List<Component>)SelectedConnectors).AddRange(connectors);            
+            ((List<Component>)SelectedConnectors).AddRange(connectors);
+            channel.Publish<ISolverWizard>(nameof(SelectedConnectors), this);
         }
 
         public void SetSensor(Component? sensor)
@@ -67,6 +76,7 @@ namespace AstroAdapters.Services
             {
                 Stage = SolutionStage.SetConnectors;
             }
+            channel.Publish<ISolverWizard>(nameof(Sensor), this);
         }
 
         public void SetTarget(Component? target)
@@ -77,6 +87,7 @@ namespace AstroAdapters.Services
             {
                 Stage = SolutionStage.SetSensor;
             }
+            channel.Publish<ISolverWizard>(nameof(Target), this);
         }
 
         public void SetStage(SolutionStage stage)
@@ -87,14 +98,28 @@ namespace AstroAdapters.Services
                 stats = new SolverStats(Target!, Sensor!);
                 logger.LogStatus($"Ready to solve image train from {Target} to {Sensor}");
                 sd = new SolutionDomain(1);
+                channel.Subscribe<StatTracker>("Cancel", (cancel, target) =>
+                {
+                    sd.Cancel();
+                });
                 sd.SolutionChanged += Sd_SolutionChanged;
                 statTracker = new StatTracker(sd, StatUpdate);
                 stats = new SolverStats(Target!, Sensor!);
                 solving = Task.Run(async () =>
                 {
                     SetStage(SolutionStage.Running);
+                    var config = new SolverConfigurationBuilder()
+                        .FromTarget(Target!)
+                        .ToSensor(Sensor!)
+                        .UsingConnections(SelectedConnectors)
+                        .AddDelayForUi()
+                        .StopWhenPerfectSolutionsCountIs(StopAfterNPerfectSolutions)
+                        .StopWhenSolutionsCountIs(StopAfterNSolutions)
+                        .LimitConnectionsTo(MaxConnectors)
+                        .WithBackfocusToleranceOf(BackfocusTolerance)
+                        .Configuration;
                     last = DateTime.Now;
-                    await sd.SolveAsync(SelectedConnectors, Target!, Sensor!, delayForUI: true);
+                    await sd.SolveAsync(config);
                     Solutions = new List<Solution>(sd.GetSolutions());
                     SetStage(SolutionStage.Solved);
                     solving!.Dispose();
@@ -107,6 +132,7 @@ namespace AstroAdapters.Services
             if (e.Solution != null)
             {
                 stats!.Solutions.Add(e.Solution!);
+                stats!.LastSolution = e.Solution!;
             }
             
             if (e.EventType == SolutionEventTypes.SolvingFinished)

@@ -1,0 +1,26 @@
+﻿.container-fluid {
+    height: 70vh;
+    overflow-y: scroll;
+}
+
+.row {
+    width: 90%;
+    margin-left: 5%;    
+}
+
+.detail {
+    background: inherit;
+}
+
+.detail:hover {
+    background: lightgray;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+div.col-1, .col-7 {
+    border: solid 1px black;
+    overflow: clip;
+}

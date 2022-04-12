@@ -83,3 +83,23 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.stat {
+    float: left;
+    margin: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    border: solid 1px gray;
+    width: 20em;
+    max-width: 20em;
+}
+
+.label {
+    text-align: center;
+    background: lightgray;
+}
+
+.value {
+    text-align: center;
+    font-weight: bold;
+}

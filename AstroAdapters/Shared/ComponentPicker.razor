@@ -1,5 +1,5 @@
 ﻿@inject IChannel Channel
-
+@inject IDataServices DataServices
 <div class="host">
     <p>
         @if (MultiSelect && Components!.Count() > SelectedComponents.Count())
@@ -19,9 +19,10 @@
         @foreach (var component in Components)
         {
             <Button @key="@component.Id" 
+                    @ref=@btnRef
+                    style="@btnStyle(component)"
                     class="btn btn-sm btn-@(IsSelected(component) ? "success" : "danger")"
                     @onclick="@(() => SelectedToggle(component))" title="@component.ToString()">
-                    <ComponentImage Component="@component" SmallSize="true"/>
                     <div>@component.Manufacturer?.Name @component.Model</div>
             </Button><span>&nbsp;</span>
         }
@@ -34,8 +35,21 @@
 </div>
 
 @code {
+    private ElementReference? buttonRef = null;
+    private ElementReference? btnRef
+    {
+        get => buttonRef;
+        set
+        {
+            if (buttonRef == null)
+            {
+                buttonRef = value;
+            }
+        }
+    }
     private bool canSelectAll => MultiSelect && Components != null && Components.Count > SelectedComponents.Count;
     private bool canSelectNone => MultiSelect && Components != null && SelectedComponents.Count > 0;
+    private IDictionary<Guid, string> images = new Dictionary<Guid, string>();
 
     [Parameter]
     public List<Component>? Components { get; set; }
@@ -54,7 +68,21 @@
 
     public List<Component> SelectedComponents { get; private set; } = new List<Component>();
 
-    protected override void OnInitialized()
+    private string btnStyle(Component component)
+    {
+        if (images.ContainsKey(component.Id))
+        {
+            return $"background-image: url('{images[component.Id]}'); background-repeat: no-repeat; background-position: left; background-size: 64px 64px";
+        }
+        InvokeAsync(async () =>
+        {
+            images.Add(component.Id, await DataServices.ResolveImageAsync(component));
+            StateHasChanged();
+        });
+        return string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
     {
         Channel.Subscribe<Component>(nameof(SelectedToggle), (_, c) =>
         {
@@ -69,7 +97,12 @@
             SelectedComponents.AddRange(InitialSelection);
         }
 
-        base.OnInitialized();
+        if (buttonRef != null)
+        {
+            await buttonRef!.Value.FocusAsync();
+        }
+
+        await base.OnInitializedAsync();
     }
 
     private bool IsSelected(Component component) => SelectedComponents.Contains(component);

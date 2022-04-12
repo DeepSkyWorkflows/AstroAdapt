@@ -1,0 +1,119 @@
+﻿@using System.Runtime.Serialization
+
+@if (Solutions != null)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1">
+                Action
+            </div>
+            <div class="col-1">
+                <strong>Weight</strong>
+            </div>
+            <div class="col-1">
+                <strong>Deviance</strong>
+            </div>
+            <div class="col-1">
+                <strong>Length (mm)</strong>
+            </div>
+            <div class="col-1">
+                <strong># Components</strong>
+            </div>
+            <div class="col-7">
+                <strong>Solution</strong>
+            </div>
+        </div>
+        @if (objectToView == null)
+        {
+            @foreach (var solution in Solutions!)
+            {
+                <div class="row detail">
+                    <div class="col-1">
+                        <span class="clickable" title="View" @onclick="@(() => objectToView = solution)">👁</span>
+                        <span class="clickable">💾</span>
+                        @if (GetObjectId(solution) == objectToDeleteId)
+                        {
+                            <span class="clickable" @onclick="@(() => ConfirmDelete(true))" title="Confirm delete">✅</span>
+                            <span>&nbsp;</span>
+                            <span class="clickable" @onclick="@(() => ConfirmDelete(false))" title="Cancel delete">❎</span>
+                        }
+                        else
+                        {
+                            <span class="clickable" @onclick="@(() => Delete(solution))" title="Delete">❌</span>
+                        }
+                    </div>
+                    <div class=" col-1">
+                        @solution.Weight
+                    </div>
+                    <div class="col-1">
+                        @solution.Deviance (@solution.DeviancePct)%
+                    </div>
+                    <div class="col-1">
+                        @solution.LengthMm mm
+                    </div>
+                    <div class="col-1">
+                        @solution.ComponentCount
+                    </div>
+                    <div class="col-7">
+                        @foreach (var component in @solution.Connections.Skip(1).SkipLast(1))
+                        {
+                            @component.ShortCode <span>&nbsp;</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-12">
+                    <h3>@objectToView.ToShortString()</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    @foreach (var component in objectToView.Connections)
+                    {
+                        <ComponentCard Component="@component" Selectable="@false"/>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                <span class="clickable" title="Back" @onclick="@(() => objectToView = null)">🔙</span>
+                <span class="clickable" title="Save">💾</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+@code {
+    private ObjectIDGenerator objectIdGenerator = new();
+
+    private long GetObjectId(object obj) => objectIdGenerator.GetId(obj, out bool _);
+
+    private long? objectToDeleteId;
+    private Solution? objectToDelete;
+    private Solution? objectToView;
+
+    private void Delete(Solution solution)
+    {
+        objectToDelete = solution;
+        objectToDeleteId = GetObjectId(solution);
+    }
+
+    private void ConfirmDelete(bool confirm)
+    {
+        objectToDeleteId = null;
+        if (confirm && Solutions != null && objectToDelete != null)
+        {
+            Solutions.Remove(objectToDelete);
+        }
+        objectToDelete = null;
+    }
+
+    [Parameter]
+    public IList<Solution>? Solutions { get; set; }
+}
