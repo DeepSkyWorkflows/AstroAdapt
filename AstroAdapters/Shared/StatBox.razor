@@ -1,0 +1,21 @@
+﻿<div class="stat">
+    <div class="label">
+        @Label
+    </div>
+    <div class="@strClass">
+        @Value
+    </div>
+</div>
+
+@code {
+    private string strClass => $"value {Class}";
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public RenderFragment? Label { get; set; } 
+
+    [Parameter]
+    public RenderFragment? Value { get; set; }
+}

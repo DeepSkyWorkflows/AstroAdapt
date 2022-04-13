@@ -1,11 +1,17 @@
-﻿.container-fluid {
+﻿.grid {
     height: 70vh;
+    overflow-y: scroll;
+    font-size: 0.8em;
+}
+
+.filters {
+    height: 20vh;
     overflow-y: scroll;
 }
 
 .row {
-    width: 90%;
-    margin-left: 5%;    
+    width: 98%;
+    margin-left: 1%;    
 }
 
 .detail {
@@ -20,7 +26,7 @@
     cursor: pointer;
 }
 
-div.col-1, .col-7 {
+div.col-1, .col-2, .col-5, .col-7 {
     border: solid 1px black;
     overflow: clip;
 }

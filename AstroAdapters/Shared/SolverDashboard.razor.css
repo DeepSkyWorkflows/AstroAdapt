@@ -1,20 +1,4 @@
-﻿.blue {
-    background: lightblue;
-}
-
-.green {
-    background: lightgreen;
-}
-
-.red {
-    background: coral;
-}
-
-button {
-    margin: 1px;
-}
-
-.finishing {
+﻿.finishing {
     position: absolute;
     left: 0;
     top: 0;

@@ -16,98 +16,96 @@ else
     else if (Stats != null)
     {
         <h3>@Stats.Title</h3>
-        <div class="stat">
-            <div class="label">
+        
+        <StatBox Class="blue">
+            <Label>
                 <span class="oi oi-clock"></span> Time elapsed:
-            </div>
-            <div class="value blue">
-                @Stats.RunningTime
-            </div>
-        </div>
+            </Label>
+            <Value>@Stats.RunningTime</Value>
+        </StatBox>
 
-        <div class="stat">
-            <div class="label">
+        <StatBox Class="blue">
+            <Label>
                 <span class="oi oi-globe"></span> Total attempts:
-            </div>
-            <div class="value blue">
+            </Label>
+            <Value>
                 @Stats.TotalAttempts
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="blue">
+            <Label>
                 <span class="oi oi-fork"></span> Total forks:
-            </div>
-            <div class="value blue">
+            </Label>
+            <Value>
                 @Stats.ForkedSolutions
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="green">
+            <Label>
                 <span class="oi oi-circle-check"></span> Solved:
-            </div>
-            <div class="value green">
+            </Label>
+            <Value>
                 @Stats.Solved
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="red">
+            <Label>
                 <span class="oi oi-layers"></span> Duplicates:
-            </div>
-            <div class="value red">
+            </Label>
+            <Value>
                 @Stats.IgnoredAsDuplicate
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="red">
+            <Label>
                 <span class="oi oi-x"></span> Dead-ends:
-            </div>
-            <div class="value red">
+            </Label>
+            <Value>
                 @Stats.AbortedDeadEnd
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="red">
+            <Label>
                 <span class="oi oi-warning"></span> Outside of tolerance:
-            </div>
-            <div class="value red">
+            </Label>
+            <Value>
                 @Stats.AbortedOutsideTolerance
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="red">
+            <Label>
                 <span class="oi oi-fire"></span> Impossible solutions:
-            </div>
-            <div class="value red">
+            </Label>
+            <Value>
                 @Stats.AbortedNoSensor
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="@queueColor">
+            <Label>
                 <span class="@dir"></span> Queued problems:
-            </div>
-            <div class="@queueColor">
+            </Label>
+            <Value>
                 @Stats.QueuedSolutions
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="label">
+            </Value>
+        </StatBox>
+        
+        <StatBox Class="red">
+            <Label>
                 Stop solving
-            </div>
-            <div class="value red">
+            </Label>
+            <Value>
                 <button class="btn btn-danger" @onclick="@(() => Cancel())">
                     <span class="oi oi-media-stop"></span> End process
                 </button>
-            </div>
-        </div>
-
+            </Value>
+        </StatBox>                
     }
 }
 @code {

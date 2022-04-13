@@ -2,7 +2,81 @@
 
 @if (Solutions != null)
 {
-    <div class="container-fluid">
+    <div class="container-fluid filters">
+        <div class="row">
+            <div class="stat">
+                <div class="label">Tolerance</div>
+                <div class="value">
+                    <input type="checkbox" @bind-value="@perfectOnly"/>
+                    Perfect only
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Must have type</div>
+                <div class="value green">
+                    <select>
+                        @foreach(var type in componentTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Must have component</div>
+                <div class="value green">
+                    <select>
+
+                    </select>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Must not have type</div>
+                <div class="value red">
+                    <select>
+
+                    </select>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Must not have component</div>
+                <div class="value red">
+                    <select>
+
+                    </select>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Sort by <button class="btn btn-link" @onclick="@(() => ascending = !ascending)">@ascendingText</button></div>
+                <div class="value">
+                    <select @bind-value="@sortBy" @bind-value:event="oninput">
+                        @foreach(var field in fields)
+                        {
+                            if (sortBy == field)
+                            {
+                                <option selected value="@field">@field</option>
+                            }
+                            else
+                            {
+                                <option value="@field">@field</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="label">Start Over</div>
+                <div class="value red">
+                    <p></p>
+                    <button class="btn btn-warning">
+                        <span class="oi oi-reload"></span>
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="grid container-fluid">
         <div class="row">
             <div class="col-1">
                 Action
@@ -10,16 +84,16 @@
             <div class="col-1">
                 <strong>Weight</strong>
             </div>
-            <div class="col-1">
+            <div class="col-2">
                 <strong>Deviance</strong>
             </div>
-            <div class="col-1">
+            <div class="col-2">
                 <strong>Length (mm)</strong>
             </div>
             <div class="col-1">
-                <strong># Components</strong>
+                <strong>Count</strong>
             </div>
-            <div class="col-7">
+            <div class="col-5">
                 <strong>Solution</strong>
             </div>
         </div>
@@ -32,7 +106,7 @@
                 </div>
             }
             
-            @foreach (var solution in Solutions!)
+            @foreach (var solution in solutions)
             {
                 <div class="row detail">
                     <div class="col-1">
@@ -52,16 +126,16 @@
                     <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.Weight
                     </div>
-                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.Deviance (@FormatPct(solution.DeviancePct))%
                     </div>
-                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.LengthMm mm
                     </div>
                     <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.ComponentCount
                     </div>
-                    <div class="col-7 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-5 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @foreach (var component in @solution.Connections.Skip(1).SkipLast(1))
                         {
                             @component.ShortCode <span>&nbsp;</span>
@@ -97,6 +171,8 @@
 
 
 @code {
+    private const string ANY = "(any)";    
+
     private ObjectIDGenerator objectIdGenerator = new();
 
     private long GetObjectId(object obj) => objectIdGenerator.GetId(obj, out bool _);
@@ -106,6 +182,36 @@
     private long? objectToDeleteId;
     private Solution? objectToDelete;
     private Solution? objectToView;
+    private bool perfectOnly;
+    private ComponentTypes? mustHaveType;
+    private ComponentTypes? mustNotHaveType;
+    private Guid? mustHaveComponent;
+    private Guid? mustNotHaveComponent;
+    private string sortBy = nameof(Solution.Weight);
+    private bool ascending = false;
+    private string ascendingText => ascending ? "Ascending" : "Descending";
+
+    private readonly string[] fields = new []
+    {
+        nameof(Solution.Weight),
+        nameof(Solution.Deviance),
+        nameof(Solution.LengthMm),
+        nameof(Solution.ComponentCount),
+    };
+
+    private IEnumerable<string> componentTypes =>
+        Solutions == null ? new[] { ANY } :
+        Enum.GetNames<ComponentTypes>().OrderBy(n => n);
+
+    private IEnumerable<(string id, string desc)> components =>
+        Solutions == null ? new[] { (ANY, ANY) } :
+        Solutions.SelectMany(s => s.Connections)
+            .Where(c =>
+                c.TargetDirectionConnectionType != ConnectionTypes.Terminator
+                && c.SensorDirectionConnectionType != ConnectionTypes.Terminator)
+            .Select(c => (id: c.Id.ToString(), desc: "{c.Manufacturer!.Name} {c.Model}"))
+            .Distinct()
+            .OrderBy(c => c.desc);
 
     private void Delete(Solution solution)
     {
@@ -125,4 +231,77 @@
 
     [Parameter]
     public IList<Solution>? Solutions { get; set; }
+
+    private IQueryable<Solution> solutions
+    {
+        get
+        {
+            if (Solutions == null)
+            {
+                return Array.Empty<Solution>().AsQueryable();
+            }
+
+            var query = Solutions.AsQueryable();
+            if (perfectOnly)
+            {
+                query = query.Where(s => s.Deviance == 0);
+            }
+            switch (sortBy)
+            {
+                case nameof(Solution.Weight):
+                    query = ascending
+                    ? query.OrderBy(s => s.Weight)
+                    : query.OrderByDescending(s => s.Weight);
+                    break;
+
+                case nameof(Solution.Deviance):
+                    query = ascending
+                    ? query.OrderBy(s => s.Deviance)
+                    : query.OrderByDescending(s => s.Deviance);
+                    break;
+
+                case nameof(Solution.LengthMm):
+                    query = ascending
+                    ? query.OrderBy(s => s.LengthMm)
+                    : query.OrderByDescending(s => s.LengthMm);
+                    break;
+
+                default:
+                    query = ascending
+                    ? query.OrderBy(s => s.ComponentCount)
+                    : query.OrderByDescending(s => s.ComponentCount);
+                    break;
+            }
+
+            return query;
+        }
+    }    
+
+    private void SelectComponentType(string component, bool mustHave)
+    {
+        ComponentTypes? type = component == ANY ? null :
+            Enum.Parse<ComponentTypes>(component);
+
+        if (mustHave)
+        {
+            mustHaveType = type;
+        }
+        else
+        {
+            mustNotHaveType = type;
+        }
+    }
+
+    private void SelectComponent(string component, bool mustHave)
+    {
+        Guid? id = component == ANY ? null : Guid.Parse(component);
+        if (mustHave)
+        {
+            mustHaveComponent = id;
+        }
+        else
+        {
+            mustNotHaveComponent = id;
+        }
+    }
 }

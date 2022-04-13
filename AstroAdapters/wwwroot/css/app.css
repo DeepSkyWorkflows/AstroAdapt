@@ -90,7 +90,7 @@ a, .btn-link {
     padding-left: 1em;
     padding-right: 1em;
     border: solid 1px gray;
-    width: 20em;
+    width: 14em;
     max-width: 20em;
 }
 
@@ -102,4 +102,8 @@ a, .btn-link {
 .value {
     text-align: center;
     font-weight: bold;
+}
+
+.tight {
+    margin: 1px;    
 }
