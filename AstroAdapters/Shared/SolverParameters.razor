@@ -6,68 +6,51 @@
         <div class="stat">
             <div class="label">Ignore backfocus?</div>
             <div class="value">
-                <input type="checkbox" @bind-value="@IgnoreBackfocus" />
+                <input type="checkbox" @bind-value="@IgnoreBackfocus" @bind-value:event="oninput"/>
                 Ignore
             </div>
         </div>
 
+        @if (IgnoreBackfocus)
+        {
+            <div class="stat">
+                <div class="label">Backfocus Tolerance</div>
+                <div class="value">No limit</div>
+            </div>
+        }
+        else
+        {
         <div class="stat">
-            <div class="label">Backfocus Tolerance @Tolerance</div>
+            <div class="label"><div>Backfocus Tolerance</div><div>@Tolerance</div></div>
             @if (SolverWizard.Target != null)
             {
                 <div class="value">
                     0
-                    <input type="range" min="0" max="100" @bind-value="@BackfocusTolerance" @bind-value:event="onchange" />
+                    <input type="range" min="0" max="100" @bind-value="@BackfocusTolerance" @bind-value:event="oninput" />
                     @MaxBackfocusRange
                 </div>
                 <div class="value">
-                    @if (Scale == 1)
-                    {
-                        <span>1&nbsp;</span>
-                    }
-                    else
-                    {
-                        <button class="btn-link" @onclick="@(() => Scale = 1)">1</button>
+                    <span class="text-sm-start">Scale:</span>
+                        <button disabled="@(Scale == 1)" title="0 - 0.001 (0.1%)" class="btn btn-link" @onclick="@(() => Scale = 1)">1</button>
                         <span>&nbsp;</span>
-                    }
-                    @if (Scale == 2)
-                    {
-                        <span>2&nbsp;</span>
-                    }
-                    else
-                    {
-                        <button class="btn-link" @onclick="@(() => Scale = 2)">2</button>
+                        <button disabled="@(Scale == 2)" title="0 - 0.01 (1%)" class="btn btn-link" @onclick="@(() => Scale = 2)">2</button>
                         <span>&nbsp;</span>
-                    }
-                    @if (Scale == 3)
-                    {
-                        <span>3&nbsp;</span>
-                    }
-                    else
-                    {
-                        <button class="btn-link" @onclick="@(() => Scale = 3)">3</button>
+                        <button disabled="@(Scale == 3)" title="0 - 0.1 (10%)" class="btn btn-link" @onclick="@(() => Scale = 3)">3</button>
                         <span>&nbsp;</span>
-                    }
-                    @if (Scale == 4)
-                    {
-                        <span>4&nbsp;</span>
-                    }
-                    else
-                    {
-                        <button class="btn-link" @onclick="@(() => Scale = 4)">4</button>
-                        <span>&nbsp;</span>
-                    }
+                        <button disabled="@(Scale == 4)" title="0 - 1 (100%)" class="btn btn-link" @onclick="@(() => Scale = 4)">4</button>
+                        <span>&nbsp;</span>                    
                 </div>
             }
         </div>
+        }
 
         <div class="stat">
-            <div class="label">Max Connections (@(RangeValue(MaxConnections))</div>
+            <div class="label">Max Connections (@(RangeValue(MaxConnections)))</div>
             @if (SolverWizard.SelectedConnectors.Count > 2)
             {
                 <div class="value">
                     <span>0&nbsp;</span>
-                    <input type="range" min="0" max="@MaxConnectionsRange" @bind-value="@MaxConnections" @bind-value:event="oninput" />
+                    <input type="range" min="0" step="1" max="@MaxConnectionsRange" @bind-value="@MaxConnections" @bind-value:event="oninput" />
                     <span>@MaxConnectionsRange</span>
                 </div>
             }
@@ -77,7 +60,7 @@
             <div class="label">Stop After @(RangeValue(MaxSolutions)) Solutions Found</div>
             <div class="value">
                 <span>0&nbsp;</span>
-                <input type="range" min="0" max="1000" @bind-value="@MaxSolutions" @bind-value:event="oninput" />
+                <input type="range" min="0" step="1" max="1000" @bind-value="@MaxSolutions" @bind-value:event="oninput" />
                 <span>1000</span>
             </div>
         </div>
@@ -86,7 +69,7 @@
             <div class="label">Stop After @(RangeValue(MaxPerfectSolutions)) Perfect Solutions Found</div>
             <div class="value">
                 <span>0&nbsp;</span>
-                <input type="range" min="0" max="1000" @bind-value="@MaxPerfectSolutions" @bind-value:event="oninput" />
+                <input type="range" min="0" step="1" max="1000" @bind-value="@MaxPerfectSolutions" @bind-value:event="oninput" />
                 <span>1000</span>
             </div>
         </div>
@@ -102,7 +85,7 @@
     private int maxPerfectSolutions;
     private int maxConnections;
 
-    private string RangeValue(int value) => value == 0 ? "Unlimited" : value.ToString();
+    private string RangeValue(int value) => value == 0 ? "♾" : value.ToString();
 
     private string MaxBackfocusRange
     {
@@ -130,14 +113,14 @@
             {
                 return string.Empty;
             }
-            var pct = $"{backFocusToleranceMm * 100}%";
+            var pct = (backFocusToleranceMm * 100).ToString("0.00") + "%";
             var range = string.Empty;
             if (SolverWizard.Target != null)
             {
                 var bf = SolverWizard.Target.BackFocusMm;
                 var deviation = bf * backFocusToleranceMm;
-                var min = bf - deviation;
-                var max = bf + deviation;
+                var min = (bf - deviation).ToString("0.00");
+                var max = (bf + deviation).ToString("0.00");
                 range = $"{min}mm to {max}mm";
             }
             return $"{pct} {range}";
@@ -149,16 +132,20 @@
         get => ignoreBackfocus;
         set
         {
-            ignoreBackfocus = value;
-            if (ignoreBackfocus)
+            if (value != ignoreBackfocus)
             {
-                backFocusToleranceMm = 0;
+                ignoreBackfocus = value;
+                if (ignoreBackfocus)
+                {
+                    savedToleranceMm = backFocusToleranceMm;
+                    backFocusToleranceMm = 0;
+                }
+                else
+                {
+                    backFocusToleranceMm = savedToleranceMm;
+                }
+                SolverWizard.BackfocusTolerance = backFocusToleranceMm;                
             }
-            else
-            {
-                backFocusToleranceMm = savedToleranceMm;
-            }
-            SolverWizard.BackfocusTolerance = backFocusToleranceMm;
         }
     }
 

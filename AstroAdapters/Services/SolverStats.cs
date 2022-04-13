@@ -23,6 +23,8 @@ namespace AstroAdapters.Services
 
         public Solution? LastSolution { get; set; }
 
+        public long QueuedSolutions { get; private set; }
+
         public List<Solution> Solutions { get; private set; } = new List<Solution>();
 
         public SolverStats(Component target, Component sensor)
@@ -39,7 +41,8 @@ namespace AstroAdapters.Services
             AbortedNoSensor = stats[SolverResults.NoSensorConnection];
             IgnoredAsDuplicate = stats[SolverResults.Duplicate];
             AbortedDeadEnd = stats[SolverResults.DeadEnd];
-            AbortedOutsideTolerance = stats[SolverResults.OutsideTolerance];            
+            AbortedOutsideTolerance = stats[SolverResults.OutsideTolerance];
+            QueuedSolutions = stats.QueuedSolutions;
         }
 
     }

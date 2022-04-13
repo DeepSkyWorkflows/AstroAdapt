@@ -120,8 +120,8 @@ namespace AstroAdapters.Services
                         .Configuration;
                     last = DateTime.Now;
                     await sd.SolveAsync(config);
-                    Solutions = new List<Solution>(sd.GetSolutions());
                     SetStage(SolutionStage.Solved);
+                    Solutions = new List<Solution>(sd.GetSolutions());
                     solving!.Dispose();
                 });
             }

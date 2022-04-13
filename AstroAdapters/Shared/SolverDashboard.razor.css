@@ -9,3 +9,31 @@
 .red {
     background: coral;
 }
+
+button {
+    margin: 1px;
+}
+
+.finishing {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 90vw;
+    height: 90vh;
+    background-image: url("../images/m5.jpg");
+    background-size: cover;
+    margin-left: 5vw;
+    margin-top: 5vh;
+    font-size: 4vh;
+    font-weight: bold;
+    text-align: center;
+}
+
+.finishingText {
+    color: green;
+    padding-top: 20vh;
+}
+
+.finishing > span {
+    color: green;
+}

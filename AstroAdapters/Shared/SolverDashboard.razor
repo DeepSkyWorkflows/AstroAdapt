@@ -7,12 +7,18 @@
 }
 else
 {
-    @if (Stats != null)
+    @if (finished)
+    {
+        <div class="finishing align-content-center">
+            <div class="finishingText">&hellip;Stand by. Your solutions are being prepared and will be revealed soon.&hellip;</div>
+        </div>
+    }
+    else if (Stats != null)
     {
         <h3>@Stats.Title</h3>
         <div class="stat">
             <div class="label">
-                Time elapsed:
+                <span class="oi oi-clock"></span> Time elapsed:
             </div>
             <div class="value blue">
                 @Stats.RunningTime
@@ -21,7 +27,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Total attempts:
+                <span class="oi oi-globe"></span> Total attempts:
             </div>
             <div class="value blue">
                 @Stats.TotalAttempts
@@ -30,7 +36,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Total forks:
+                <span class="oi oi-fork"></span> Total forks:
             </div>
             <div class="value blue">
                 @Stats.ForkedSolutions
@@ -39,7 +45,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Solved:
+                <span class="oi oi-circle-check"></span> Solved:
             </div>
             <div class="value green">
                 @Stats.Solved
@@ -48,7 +54,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Duplicates:
+                <span class="oi oi-layers"></span> Duplicates:
             </div>
             <div class="value red">
                 @Stats.IgnoredAsDuplicate
@@ -57,7 +63,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Dead-ends:
+                <span class="oi oi-x"></span> Dead-ends:
             </div>
             <div class="value red">
                 @Stats.AbortedDeadEnd
@@ -66,7 +72,7 @@ else
 
         <div class="stat">
             <div class="label">
-                Outside of tolerance:
+                <span class="oi oi-warning"></span> Outside of tolerance:
             </div>
             <div class="value red">
                 @Stats.AbortedOutsideTolerance
@@ -75,10 +81,19 @@ else
 
         <div class="stat">
             <div class="label">
-                Impossible solutions:
+                <span class="oi oi-fire"></span> Impossible solutions:
             </div>
             <div class="value red">
                 @Stats.AbortedNoSensor
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="label">
+                <span class="@dir"></span> Queued problems:
+            </div>
+            <div class="@queueColor">
+                @Stats.QueuedSolutions
             </div>
         </div>
 
@@ -88,7 +103,7 @@ else
             </div>
             <div class="value red">
                 <button class="btn btn-danger" @onclick="@(() => Cancel())">
-                    End process
+                    <span class="oi oi-media-stop"></span> End process
                 </button>
             </div>
         </div>
@@ -99,12 +114,46 @@ else
     [Parameter]
     public SolverStats? Stats { get; set; }
 
+    private bool finished = false;
+    private long lastQueue = 0;
+    private string dir = "oi oi-arrow-thick-top";
+    private string queueColor = "value red";
+
     protected override Task OnInitializedAsync()
     {
-        Channel.Subscribe<StatTracker>(nameof(StatTracker), (topic, payload) => InvokeAsync(StateHasChanged));
-        Channel.Subscribe<ISolverWizard>(nameof(SolutionStage), (topic, stage) => InvokeAsync(StateHasChanged));
+        Channel.Subscribe<StatTracker>(nameof(StatTracker), (topic, payload) => Refresh(null));
+        Channel.Subscribe<ISolverWizard>(nameof(SolutionStage), (topic, wizard) => Refresh(wizard));       
         return base.OnInitializedAsync();
     }
 
-    private void Cancel() => Channel.Publish<StatTracker>(nameof(Cancel), null);    
+    private void Cancel()
+    {
+        finished = true;
+        StateHasChanged();
+        Channel.Publish<StatTracker>(nameof(Cancel), null);
+    }
+
+    private void Refresh(ISolverWizard? wizard)
+    {
+        if (wizard != null && wizard.Stage == SolutionStage.Solved)
+        {
+            finished = true;
+        }
+
+        var diff = Stats!.QueuedSolutions - lastQueue;
+        if (diff > 0)
+        {
+            dir = "oi oi-arrow-thick-top";
+            queueColor = "value red";
+        }
+        else
+        {
+            dir = "oi oi-arrow-thick-bottom";
+            queueColor = "value green";
+        }
+
+        lastQueue = Stats!.QueuedSolutions;
+        
+        InvokeAsync(StateHasChanged);
+    }
 }

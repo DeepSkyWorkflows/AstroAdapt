@@ -24,3 +24,7 @@ div.col-1, .col-7 {
     border: solid 1px black;
     overflow: clip;
 }
+
+div.oi {
+    float: left;
+}

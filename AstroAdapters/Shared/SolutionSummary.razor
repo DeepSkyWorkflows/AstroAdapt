@@ -1,23 +1,16 @@
 ﻿@inject ISolverWizard SolverWizard
 @inject IChannel Channel
 
-<h3>Most recent solution</h3>
-@if (SolverWizard.LastSolution != null)
+@if (SolverWizard.Stage == SolutionStage.Running)
 {
-    <div class="container-fluid">
-        @foreach(var component in SolverWizard.LastSolution.Connections)
+    <h3>Top 10 solutions</h3>
+    <div class="wrapper">
+        @foreach (var solution in SolverWizard.Stats!.Solutions.OrderByDescending(s => s.Weight).Take(10))
         {
-            <ComponentImage Component="@component" SmallSize="true"/>@component.ShortCode<span>&nbsp;</span>
+            <div class="@getClass(solution)">Len: @solution.LengthMm Deviance: @solution.Deviance (@(solution.DeviancePct*100)%) @string.Join(' ', solution.Connections.Select(c => c.ShortCode))</div>
         }
     </div>
 }
-<h3>Top 10 solutions</h3>
-<div class="wrapper">
-@foreach(var solution in SolverWizard.Stats!.Solutions.OrderByDescending(s => s.Weight).Take(10))
-{
-    <div class="@getClass(solution)">Len: @solution.LengthMm Deviance: @solution.Deviance (@(solution.DeviancePct*100)%) @string.Join(' ', solution.Connections.Select(c => c.ShortCode))</div>
-}
-</div>
 
 @code {
     private string getClass(Solution solution)
@@ -37,6 +30,7 @@
     protected override void OnInitialized()
     {
         Channel.Subscribe<StatTracker>(nameof(StatTracker), (topic, payload) => InvokeAsync(StateHasChanged));        
+        Channel.Subscribe<ISolverWizard>(string.Empty, (topic, payload) => InvokeAsync(StateHasChanged));        
         base.OnInitialized();
     }
 }

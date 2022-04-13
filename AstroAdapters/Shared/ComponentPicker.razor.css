@@ -1,9 +1,11 @@
-﻿button {
+﻿button.component {
     float: left;
-    margin: 1em;
+    margin: 0.5em;
     width: 20em;
+    min-height: 64px;
 }
 
-button div {
+button.component div {
     margin: 3px;
+    margin-left: 64px;
 }

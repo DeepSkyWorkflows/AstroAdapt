@@ -38,6 +38,11 @@
         public long CorrelationId { get; set; }
 
         /// <summary>
+        /// Gets the number of queued solutions.
+        /// </summary>
+        public long QueuedSolutions { get; set; }
+
+        /// <summary>
         /// Creates a new instance and registers for updates.
         /// </summary>
         /// <param name="sd">The <see cref="SolutionDomain"/>.</param>
@@ -61,6 +66,10 @@
             LastEvent = e.EventType;
             Monitor.Enter(mutex);
             statistics[e.SolverResult]++;
+            if (sender is SolutionDomain sd)
+            {
+                QueuedSolutions = sd.NumberSolutions;
+            }
             Monitor.Exit(mutex);
             callback(this);
         }

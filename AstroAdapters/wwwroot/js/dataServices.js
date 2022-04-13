@@ -10,7 +10,14 @@
 const resolveImage = async function (id, componentType) {
     const extensionsPath = `${globals.extensions}/${id}`;
     const cachedPath = `${globals.images}/${id}`;
-    const fetchPath = `${globals.defaultImages}/${componentType}.png`;
+    const fetchPaths = [
+        `${globals.defaultImages}/${id}.png`,
+        `${globals.defaultImages}/${id}.jpg`,
+        `${globals.defaultImages}/${id}.jpeg`,
+        `${globals.defaultImages}/${id}.tif`,
+        `${globals.defaultImages}/${id}.tiff`,
+        `${globals.defaultImages}/${id}.gif`,
+        `${globals.defaultImages}/${componentType}.png`];
     const cache = await caches.open(globals.cacheName);
     const res = await cache.match(extensionsPath);
     let extension = 'png';
@@ -23,12 +30,19 @@ const resolveImage = async function (id, componentType) {
             return URL.createObjectURL(imageBlob);            
         }
     }
-    const response = await fetch(fetchPath);
-    if (response) {
-        const responseBlob = await response.clone().blob();
-        cache.put(extensionsPath, new Response('png'));
-        cache.put(`${cachedPath}.${extension}`, response);
-        return URL.createObjectURL(responseBlob);        
+    for (let idx = 0; idx < fetchPaths.length; idx++) {
+
+        const response = await fetch(fetchPaths[idx]);
+
+        if (response && response.ok) {
+
+            const responseBlob = await response.clone().blob();
+
+            cache.put(extensionsPath, new Response(fetchPaths[idx].split('.')[1]));
+            cache.put(`${cachedPath}.${extension}`, response);
+
+            return URL.createObjectURL(responseBlob);
+        }
     }
 }
 

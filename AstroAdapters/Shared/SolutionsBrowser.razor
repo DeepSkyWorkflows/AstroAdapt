@@ -25,36 +25,43 @@
         </div>
         @if (objectToView == null)
         {
+            if  (Solutions.Count < 1)
+            {
+                <div class="alert alert-danger">
+                    <span class="oi oi-ban"></span> No solution could be found based on your parameters.
+                </div>
+            }
+            
             @foreach (var solution in Solutions!)
             {
                 <div class="row detail">
                     <div class="col-1">
-                        <span class="clickable" title="View" @onclick="@(() => objectToView = solution)">👁</span>
-                        <span class="clickable">💾</span>
+                        <span class="clickable oi oi-cloud-upload"></span>
+                        <span>&nbsp;</span>
                         @if (GetObjectId(solution) == objectToDeleteId)
                         {
-                            <span class="clickable" @onclick="@(() => ConfirmDelete(true))" title="Confirm delete">✅</span>
+                            <span class="clickable oi oi-circle-check" @onclick="@(() => ConfirmDelete(true))" title="Confirm delete"></span>
                             <span>&nbsp;</span>
-                            <span class="clickable" @onclick="@(() => ConfirmDelete(false))" title="Cancel delete">❎</span>
+                            <span class="clickable oi oi-circle-x" @onclick="@(() => ConfirmDelete(false))" title="Cancel delete"></span>
                         }
                         else
                         {
-                            <span class="clickable" @onclick="@(() => Delete(solution))" title="Delete">❌</span>
+                            <span class="clickable oi oi-x" @onclick="@(() => Delete(solution))" title="Delete"></span>
                         }
                     </div>
-                    <div class=" col-1">
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.Weight
                     </div>
-                    <div class="col-1">
-                        @solution.Deviance (@solution.DeviancePct)%
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                        @solution.Deviance (@FormatPct(solution.DeviancePct))%
                     </div>
-                    <div class="col-1">
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.LengthMm mm
                     </div>
-                    <div class="col-1">
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @solution.ComponentCount
                     </div>
-                    <div class="col-7">
+                    <div class="col-7 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
                         @foreach (var component in @solution.Connections.Skip(1).SkipLast(1))
                         {
                             @component.ShortCode <span>&nbsp;</span>
@@ -67,7 +74,13 @@
         {
             <div class="row">
                 <div class="col-12">
-                    <h3>@objectToView.ToShortString()</h3>
+                    <h3>
+                        <span class="clickable oi oi-action-undo" @onclick="@(() => objectToView = null)"></span>
+                        @objectToView.ToShortString()
+                    </h3>
+                    <button class="btn btn-primary btn-sm">
+                        <span class="oi oi-cloud-upload"></span> Save solution
+                    </button>
                 </div>
             </div>
             <div class="row">
@@ -77,13 +90,7 @@
                         <ComponentCard Component="@component" Selectable="@false"/>
                     }
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                <span class="clickable" title="Back" @onclick="@(() => objectToView = null)">🔙</span>
-                <span class="clickable" title="Save">💾</span>
-                </div>
-            </div>
+            </div>            
         }
     </div>
 }
@@ -93,6 +100,8 @@
     private ObjectIDGenerator objectIdGenerator = new();
 
     private long GetObjectId(object obj) => objectIdGenerator.GetId(obj, out bool _);
+
+    private string FormatPct(double pct) => (pct * 100).ToString("0.00");
 
     private long? objectToDeleteId;
     private Solution? objectToDelete;
