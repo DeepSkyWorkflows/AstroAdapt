@@ -1,4 +1,5 @@
-﻿button.component {
+﻿
+button.component {
     float: left;
     margin: 0.5em;
     width: 20em;
@@ -6,6 +7,6 @@
 }
 
 button.component div {
-    margin: 3px;
+    margin: 1px;
     margin-left: 64px;
 }
