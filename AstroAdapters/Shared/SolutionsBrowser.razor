@@ -143,7 +143,7 @@
                 <div class="col-12">
                     <h3>
                         <span class="clickable oi oi-action-undo" @onclick="@(() => objectToView = null)"></span>
-                        @objectToView.ToShortString()
+                        Len: @objectToView.LengthMm mm (Deviation: @objectToView.DeviancePct.ToString("0.00") %)
                     </h3>
                     <button class="btn btn-primary btn-sm">
                         <span class="oi oi-cloud-upload"></span> Save solution

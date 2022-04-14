@@ -25,6 +25,10 @@ html, body {
     color: red;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 h1:focus {
     outline: none;
 }
@@ -86,12 +90,12 @@ a, .btn-link {
 
 .stat {
     float: left;
-    margin: 1em;
+    margin: 3px;
+    font-size: 0.9em;
     padding-left: 1em;
     padding-right: 1em;
     border: solid 1px gray;
-    width: 14em;
-    max-width: 20em;
+    width: 16em;    
 }
 
 .label {

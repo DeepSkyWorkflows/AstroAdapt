@@ -1,4 +1,10 @@
-﻿.grid {
+﻿h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 1em;
+}
+
+.grid {
     height: 70vh;
     overflow-y: scroll;
     font-size: 0.8em;

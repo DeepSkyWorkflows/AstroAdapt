@@ -2,42 +2,60 @@
 {
     <div aria-disabled="@(!Selectable)" aria-selected="@Selected" title="@title" class="card @extras" @onclick="@(() => Clicked())">
         <h5 class="card-title"><ComponentImage SmallSize=true Component="@Component" />
-        @Component.Manufacturer?.Name @Component.Model</h5>
-        <p>
-            <strong>@Component.ComponentType</strong>&nbsp;<strong>BF:</strong> @($"{Component.BackFocusMm}mm")
-            &nbsp;<strong>Len:</strong> @($"{Component.LengthMm}mm");
-        </p>
-        <p>
-            <button disabled="@(true)" class="btn btn-sm btn-success">
-                @foreach (var iconClass in icon(Component.TargetDirectionConnectionType))
+        <div>@Component.Manufacturer?.Name @Component.Model</div>
+        <div>
+            @if (Component.ThreadRecessMm > 0)
                 {
-                    <span class="@iconClass"></span>
+                    <span class="lenText thread">@Component.ThreadRecessMm mm&nbsp;</span>
+                }
+            @if (Component.LengthMm > 0)
+                {
+                    <span class="lenText">@Component.LengthMm mm</span>
+                }
+        </div>              
+    </h5>
+        @if (collapsed)
+        {
+            <p class="clickable" @onclick="@(() => collapsed=false)">
+                <span class="oi oi-expand-down"></span> Show connections
+            </p>            
+        }
+        else
+        {
+            <p class="clickable" @onclick="@(() => collapsed=true)">
+                <span class="oi oi-expand-up"></span> Hide connections
+            </p>            
+            <p>
+                <button disabled="@(true)" class="btn btn-sm btn-success">
+                    @foreach (var iconClass in icon(Component.TargetDirectionConnectionType))
+                    {
+                        <span class="@iconClass"></span>
+                        <span>&nbsp;</span>
+                    }
+                    @Component.TargetDirectionConnectionSize
+                </button>
+            </p>
+            <p>
+                <button disabled="@(true)" class="btn btn-sm btn-dark">
+                    @if (Component.IsReversible)
+                    {
+                        <span class="oi oi-loop-circular"></span>
+                    }
+                    @Component.ShortCode
+                </button>
+            </p>
+            <p>
+                <button disabled="@(true)" class="btn btn-sm btn-danger">
+                    @Component.SensorDirectionConnectionSize
                     <span>&nbsp;</span>
-                }
-                @Component.TargetDirectionConnectionSize
-            </button>
-        </p>
-        <p>
-            <button disabled="@(true)" class="btn btn-sm btn-dark">
-                @if (Component.IsReversible)
-                {
-                    <span class="oi oi-loop-circular"></span>
-                }
-                @Component.ShortCode
-            </button>
-        </p>
-        <p>
-            <button disabled="@(true)" class="btn btn-sm btn-danger">
-                @Component.SensorDirectionConnectionSize
-                <span>&nbsp;</span>
-                @foreach (var iconClass in icon(Component.SensorDirectionConnectionType))
-                {
-                    <span class="@iconClass"></span>
-                    <span>&nbsp;</span>
-                }
-            </button>
-        </p>
-        <p>@Component.InsertionPoint</p>        
+                    @foreach (var iconClass in icon(Component.SensorDirectionConnectionType))
+                    {
+                        <span class="@iconClass"></span>
+                        <span>&nbsp;</span>
+                    }
+                </button>
+            </p>
+        }
     </div>
 }
 
@@ -48,12 +66,16 @@
 
 @code {
     private bool selected = false;
+    private bool collapsed = true;
 
     [Parameter]
     public Component? Component { get; set; }
 
     [Parameter]
     public bool EmptyCard { get; set; }
+
+    [Parameter]
+    public bool Diagram { get; set; }
 
     [Parameter]
     public bool Selected

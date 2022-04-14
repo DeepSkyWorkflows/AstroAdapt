@@ -1,9 +1,9 @@
 ﻿div.card {
     width: 20em;
-    height: 20em;
+    min-height: 10em;
     float: left;
-    margin-left: 2em;
-    margin-top: 2em;
+    margin-left: 1em;
+    margin-top: 1em;
     font-size: 0.8em;
     border: solid 0.25em lightgray;
 }
@@ -19,13 +19,27 @@
     background: lightyellow;
 }
 .card-title {
-    text-align: center;
+    text-align: right;
     border: solid 1px grey;
     background: lightgray;
-    font-size: 1em;
+    font-size: 1.2em;
     font-weight: bold;
+}
+.card-title div {
+    margin-top: 1em;
+    margin-right: 1em;
 }
 p {
     text-align: center;
     margin: 0.2em;
+}
+.lenText {
+    font-size: 0.8em;
+}
+.thread {
+    color: red;
+}
+.clickable:hover
+{
+    color: blue;
 }
