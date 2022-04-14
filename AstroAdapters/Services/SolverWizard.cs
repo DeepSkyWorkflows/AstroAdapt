@@ -97,10 +97,12 @@ namespace AstroAdapters.Services
             {
                 stats = new SolverStats(Target!, Sensor!);
                 logger.LogStatus($"Ready to solve image train from {Target} to {Sensor}");
+                logger.LogStatus($"With components {string.Join(' ', SelectedConnectors.Select(c => c.ShortCode))}");
+                logger.LogStatus($"Perfect: {StopAfterNPerfectSolutions} Solutions: {StopAfterNSolutions} Connectors: {MaxConnectors} Backfocus: {BackfocusTolerance}");
                 sd = new SolutionDomain(1);
                 channel.Subscribe<StatTracker>("Cancel", (cancel, target) =>
                 {
-                    sd.Cancel();
+                    sd.Cancel();                    
                 });
                 sd.SolutionChanged += Sd_SolutionChanged;
                 statTracker = new StatTracker(sd, StatUpdate);

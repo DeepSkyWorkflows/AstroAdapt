@@ -14,7 +14,7 @@
             <div class="stat">
                 <div class="label">Must have type</div>
                 <div class="value green">
-                    <select>
+                    <select @bind-value="@MustHaveType" @bind-value:event="oninput">
                         @foreach(var type in componentTypes)
                         {
                             <option value="@type">@type</option>
@@ -52,14 +52,7 @@
                     <select @bind-value="@sortBy" @bind-value:event="oninput">
                         @foreach(var field in fields)
                         {
-                            if (sortBy == field)
-                            {
-                                <option selected value="@field">@field</option>
-                            }
-                            else
-                            {
                                 <option value="@field">@field</option>
-                            }
                         }
                     </select>
                 </div>
@@ -199,19 +192,27 @@
         nameof(Solution.ComponentCount),
     };
 
+    private string MustHaveType
+    {
+        get => mustHaveType == null ? ANY : mustHaveType.ToString()!;
+        set => mustHaveType = value == ANY
+            ? null
+            : Enum.Parse<ComponentTypes>(value!);
+    }    
+
     private IEnumerable<string> componentTypes =>
         Solutions == null ? new[] { ANY } :
-        Enum.GetNames<ComponentTypes>().OrderBy(n => n);
+        new[] { ANY }.Union(Enum.GetNames<ComponentTypes>().OrderBy(n => n));
 
     private IEnumerable<(string id, string desc)> components =>
-        Solutions == null ? new[] { (ANY, ANY) } :
-        Solutions.SelectMany(s => s.Connections)
+        Solutions == null ? new[] { (id: ANY, desc: ANY) } :
+        new[] { (id: ANY, desc: ANY) }.Union(Solutions.SelectMany(s => s.Connections)
             .Where(c =>
                 c.TargetDirectionConnectionType != ConnectionTypes.Terminator
                 && c.SensorDirectionConnectionType != ConnectionTypes.Terminator)
             .Select(c => (id: c.Id.ToString(), desc: "{c.Manufacturer!.Name} {c.Model}"))
             .Distinct()
-            .OrderBy(c => c.desc);
+            .OrderBy(c => c.desc));
 
     private void Delete(Solution solution)
     {
@@ -246,6 +247,16 @@
             {
                 query = query.Where(s => s.Deviance == 0);
             }
+
+            if (mustHaveType != null)
+            {
+                query = query
+                .Where(s =>
+                    s.Connections.Any(
+                        c =>
+                        c.ComponentType == mustHaveType));
+            }
+
             switch (sortBy)
             {
                 case nameof(Solution.Weight):
@@ -275,33 +286,5 @@
 
             return query;
         }
-    }    
-
-    private void SelectComponentType(string component, bool mustHave)
-    {
-        ComponentTypes? type = component == ANY ? null :
-            Enum.Parse<ComponentTypes>(component);
-
-        if (mustHave)
-        {
-            mustHaveType = type;
-        }
-        else
-        {
-            mustNotHaveType = type;
-        }
-    }
-
-    private void SelectComponent(string component, bool mustHave)
-    {
-        Guid? id = component == ANY ? null : Guid.Parse(component);
-        if (mustHave)
-        {
-            mustHaveComponent = id;
-        }
-        else
-        {
-            mustNotHaveComponent = id;
-        }
-    }
+    }        
 }

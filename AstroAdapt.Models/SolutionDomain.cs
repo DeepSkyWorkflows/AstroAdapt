@@ -116,7 +116,7 @@ namespace AstroAdapt.Models
 
             solvingDone = new TaskCompletionSource<bool>();
 
-            if (workerCount < 1)
+            if (workerCount <= 1)
             {
                 Worker();
             }
@@ -412,27 +412,28 @@ namespace AstroAdapt.Models
                     if (configuration.StopAfterNSolutions > 0
                         && Solutions.Count >= configuration.StopAfterNSolutions)
                     {
+                        SolverQueue.Clear();
                         continue;
                     }
 
                     if (configuration.StopAfterNPerfectSolutions > 0
                         && Solutions.Where(s => s.Deviance == 0).Count() >= configuration.StopAfterNPerfectSolutions)
                     {
+                        SolverQueue.Clear();
                         continue;
                     }
 
                     if (cancel)
                     {
+                        SolverQueue.Clear();
                         continue;
                     }
 
                     var (result, solution) = Solve(job.flags, job.solution);
                     OnSolutionChanged(result, solution);
                 }
-                else
-                {
-                    workToDo = !SolverQueue.IsEmpty;
-                }
+
+                workToDo = !SolverQueue.IsEmpty;                
             }
 
             if (Solving && !(solvingDone!.Task.IsCompleted))
