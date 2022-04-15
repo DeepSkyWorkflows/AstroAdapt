@@ -40,3 +40,11 @@ div.col-1, .col-2, .col-5, .col-7 {
 div.oi {
     float: left;
 }
+
+input[type=text] {
+    width: 60%;
+}
+
+.alert {
+    margin: 1px;
+}

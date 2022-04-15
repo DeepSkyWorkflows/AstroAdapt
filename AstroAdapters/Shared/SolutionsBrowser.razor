@@ -1,4 +1,6 @@
-﻿@using System.Runtime.Serialization
+﻿@inject NavigationManager NavManager
+@inject IDataServices DataServices
+@using System.Runtime.Serialization
 
 @if (Solutions != null)
 {
@@ -7,14 +9,14 @@
             <div class="stat">
                 <div class="label">Tolerance</div>
                 <div class="value">
-                    <input type="checkbox" @bind-value="@perfectOnly"/>
+                    <input tabindex="100" type="checkbox" @bind-value="@perfectOnly"/>
                     Perfect only
                 </div>
             </div>
             <div class="stat">
                 <div class="label">Must have type</div>
                 <div class="value green">
-                    <select @bind-value="@MustHaveType" @bind-value:event="oninput">
+                    <select tabindex="101" @bind-value="@MustHaveType" @bind-value:event="oninput">
                         @foreach(var type in componentTypes)
                         {
                             <option value="@type">@type</option>
@@ -25,31 +27,40 @@
             <div class="stat">
                 <div class="label">Must have component</div>
                 <div class="value green">
-                    <select>
-
+                    <select tabindex="102" @bind-value="@MustHaveComponent" @bind-value:event="oninput">
+                        @foreach(var component in components)
+                        {
+                            <option value="@component.id">@component.desc</option>
+                        }
                     </select>
                 </div>
             </div>
             <div class="stat">
                 <div class="label">Must not have type</div>
                 <div class="value red">
-                    <select>
-
+                    <select tabindex="103" @bind-value="@MustNotHaveType" @bind-value:event="oninput">
+                        @foreach(var type in componentTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
                     </select>
                 </div>
             </div>
             <div class="stat">
                 <div class="label">Must not have component</div>
                 <div class="value red">
-                    <select>
-
+                    <select tabindex="104" @bind-value="@MustNotHaveComponent" @bind-value:event="oninput">
+                        @foreach(var component in components)
+                        {
+                            <option value="@component.id">@component.desc</option>
+                        }
                     </select>
                 </div>
             </div>
             <div class="stat">
                 <div class="label">Sort by <button class="btn btn-link" @onclick="@(() => ascending = !ascending)">@ascendingText</button></div>
                 <div class="value">
-                    <select @bind-value="@sortBy" @bind-value:event="oninput">
+                    <select tabindex="105" @bind-value="@sortBy" @bind-value:event="oninput">
                         @foreach(var field in fields)
                         {
                                 <option value="@field">@field</option>
@@ -60,8 +71,7 @@
             <div class="stat">
                 <div class="label">Start Over</div>
                 <div class="value red">
-                    <p></p>
-                    <button class="btn btn-warning">
+                    <button tabindex="106" class="btn btn-warning" @onclick="@(() => StartOver())">
                         <span class="oi oi-reload"></span>
                         Start Over
                     </button>
@@ -116,19 +126,19 @@
                             <span class="clickable oi oi-x" @onclick="@(() => Delete(solution))" title="Delete"></span>
                         }
                     </div>
-                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => View(solution))">
                         @solution.Weight
                     </div>
-                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => View(solution))">
                         @solution.Deviance (@FormatPct(solution.DeviancePct))%
                     </div>
-                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-2 clickable" title="Click for detailed view" @onclick="@(() => View(solution))">
                         @solution.LengthMm mm
                     </div>
-                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-1 clickable" title="Click for detailed view" @onclick="@(() => View(solution))">
                         @solution.ComponentCount
                     </div>
-                    <div class="col-5 clickable" title="Click for detailed view" @onclick="@(() => objectToView = solution)">
+                    <div class="col-5 clickable" title="Click for detailed view" @onclick="@(() => View(solution))">
                         @foreach (var component in @solution.Connections.Skip(1).SkipLast(1))
                         {
                             @component.ShortCode <span>&nbsp;</span>
@@ -139,25 +149,41 @@
         }
         else
         {
-            <div class="row">
-                <div class="col-12">
-                    <h3>
-                        <span class="clickable oi oi-action-undo" @onclick="@(() => objectToView = null)"></span>
-                        Len: @objectToView.LengthMm mm (Deviation: @objectToView.DeviancePct.ToString("0.00") %)
-                    </h3>
-                    <button class="btn btn-primary btn-sm">
-                        <span class="oi oi-cloud-upload"></span> Save solution
-                    </button>
+            if (!savingSolution && !solutionSaved)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <h3>
+                            <span class="clickable oi oi-action-undo" @onclick="@(() => objectToView = null)"></span>
+                            Len: @objectToView.LengthMm mm (Deviation: @objectToView.DeviancePct.ToString("0.00") %)
+                        </h3>
+                        Enter description: <input tabindex="1" @ref=@inpRef type="text" placeholder="@objectToView.ToString()" @bind-value="@description"
+                        @bind-value:event="oninput"/>
+                        <button class="btn btn-primary btn-sm" @onclick="@(async () => await SaveAsync())">
+                            <span class="oi oi-cloud-upload"></span> Save solution
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    @foreach (var component in objectToView.Connections)
+                <div class="row">
+                    <div class="col-12">
+                        @foreach (var component in objectToView.Connections)
+                        {
+                            <ComponentCard Component="@component" Selectable="@false"/>
+                        }
+                    </div>
+                </div>
+            }
+            else if (savingSolution)
+            {
+                <div class="alert alert-info"><span class="oi oi-clock"></span> Saving your solution...</div>
+            }
+            else if (solutionSaved)
                     {
-                        <ComponentCard Component="@component" Selectable="@false"/>
+                        <div class="alert alert-success">
+                            <span class="oi oi-circle-check"></span> Solution was successfully saved.                          
+                            <span class="clickable oi oi-action-undo" @onclick="@(() => objectToView = null)"></span>                            
+                        </div>
                     }
-                </div>
-            </div>            
         }
     </div>
 }
@@ -172,6 +198,7 @@
 
     private string FormatPct(double pct) => (pct * 100).ToString("0.00");
 
+    private ElementReference inpRef;
     private long? objectToDeleteId;
     private Solution? objectToDelete;
     private Solution? objectToView;
@@ -183,6 +210,9 @@
     private string sortBy = nameof(Solution.Weight);
     private bool ascending = false;
     private string ascendingText => ascending ? "Ascending" : "Descending";
+    private string? description;
+    private bool savingSolution;
+    private bool solutionSaved;
 
     private readonly string[] fields = new []
     {
@@ -200,6 +230,30 @@
             : Enum.Parse<ComponentTypes>(value!);
     }    
 
+    private string MustNotHaveType
+    {
+        get => mustNotHaveType == null ? ANY : mustNotHaveType.ToString()!;
+        set => mustNotHaveType = value == ANY
+            ? null
+            : Enum.Parse<ComponentTypes>(value!);
+    }    
+
+    private string MustHaveComponent
+    {
+        get => mustHaveComponent == null ? ANY : mustHaveComponent.ToString()!;
+        set => mustHaveComponent = value == ANY
+            ? null
+            : Guid.Parse(value);
+    }    
+
+    private string MustNotHaveComponent
+    {
+        get => mustNotHaveComponent == null ? ANY : mustNotHaveComponent.ToString()!;
+        set => mustNotHaveComponent = value == ANY
+            ? null
+            : Guid.Parse(value);
+    }    
+
     private IEnumerable<string> componentTypes =>
         Solutions == null ? new[] { ANY } :
         new[] { ANY }.Union(Enum.GetNames<ComponentTypes>().OrderBy(n => n));
@@ -210,7 +264,7 @@
             .Where(c =>
                 c.TargetDirectionConnectionType != ConnectionTypes.Terminator
                 && c.SensorDirectionConnectionType != ConnectionTypes.Terminator)
-            .Select(c => (id: c.Id.ToString(), desc: "{c.Manufacturer!.Name} {c.Model}"))
+            .Select(c => (id: c.Id.ToString(), desc: $"{c.Manufacturer!.Name} {c.Model}"))
             .Distinct()
             .OrderBy(c => c.desc));
 
@@ -257,6 +311,33 @@
                         c.ComponentType == mustHaveType));
             }
 
+            if (mustNotHaveType != null)
+            {
+                query = query
+                .Where(s =>
+                    !s.Connections.Any(
+                        c =>
+                        c.ComponentType == mustHaveType));
+            }
+
+            if (mustHaveComponent != null)
+            {
+                query = query
+                .Where(s =>
+                    s.Connections.Any(
+                        c =>
+                        c.Id == mustHaveComponent));
+            }
+
+            if (mustNotHaveComponent != null)
+            {
+                query = query
+                .Where(s =>
+                    !s.Connections.Any(
+                        c =>
+                        c.Id == mustNotHaveComponent));
+            }
+
             switch (sortBy)
             {
                 case nameof(Solution.Weight):
@@ -286,5 +367,24 @@
 
             return query;
         }
-    }        
+    }
+
+    private void View(Solution solution)
+    {
+        solutionSaved = savingSolution = false;
+        description = null;
+        objectToView = solution;
+        InvokeAsync(async () => await inpRef.FocusAsync());
+    }
+
+    private async Task SaveAsync()
+    {
+        savingSolution = true;
+        await DataServices.SaveSolutionAsync(objectToView!, description ?? objectToView!.ToString());
+        savingSolution = false;
+        solutionSaved = true;
+        Solutions!.Remove(objectToView!);
+    }
+
+    private void StartOver() => NavManager.NavigateTo(string.Empty, true);    
 }

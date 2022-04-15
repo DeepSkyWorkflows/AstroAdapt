@@ -2,6 +2,7 @@
     cacheName: "astroAdapt",
     manufacturers: "/data/manufacturers.json",
     preferences: "/data/preferences.json",
+    solutions: "/data/solutions.json",
     defaultImages: "/images",
     extensions: "/imageExtensions",
     images: "/data/imageCache"
@@ -80,5 +81,6 @@ const save = async function (path, payload) {
 const getManufacturers = async () => await retrieve(globals.manufacturers);
 const getPreferences = async () => await retrieve(globals.preferences);
 const putPreferences = async (payload) => await save(globals.preferences, payload);
-
-export { getManufacturers, getPreferences, putPreferences, resolveImage };
+const getSolutions = async () => await retrieve(globals.solutions);
+const putSolutions = async (payload) => await save(globals.solutions, payload);
+export { getManufacturers, getPreferences, putPreferences, resolveImage, getSolutions, putSolutions };

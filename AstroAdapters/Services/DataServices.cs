@@ -57,5 +57,15 @@ namespace AstroAdapters.Services
             var module = await moduleTask.Value;
             return await module.InvokeAsync<string>("resolveImage", component.Id.ToString(), component.ComponentType.ToString()); 
         }
+
+        public async Task<SavedSolution> SaveSolutionAsync(Solution solution, string description)
+        {
+            var solutions = await GetAsync<List<SavedSolution>>("getSolutions") ?? new List<SavedSolution>();
+            var result = solution.ToSavedSolution();
+            result.Description = description;
+            solutions!.Add(result);
+            await SetAsync(solutions, "putSolutions");
+            return result;
+        }
     }
 }

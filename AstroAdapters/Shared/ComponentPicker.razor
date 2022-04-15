@@ -18,7 +18,9 @@
     {
         @foreach (var component in Components)
         {
-            <Button @key="@component.Id"                    
+            <Button @key="@component.Id"
+                    tabindex="@(++tabIndex)"
+                    @ref=@BtnRef
                     style="@btnStyle(component)"
                     class="component btn btn-sm btn-@(IsSelected(component) ? "success" : "danger")"
                     @onclick="@(() => SelectedToggle(component))" title="@component.ToString()">
@@ -34,8 +36,21 @@
 </div>
 
 @code {
+    private int tabIndex;
     private bool canSelectAll => MultiSelect && Components != null && Components.Count > SelectedComponents.Count;
     private bool canSelectNone => MultiSelect && Components != null && SelectedComponents.Count > 0;
+    private ElementReference? buttonRef;
+    private ElementReference? BtnRef
+    {
+        get => buttonRef;
+        set
+        {
+            if (buttonRef == null)
+            {
+                buttonRef = value;
+            }
+        }
+    }
     private IDictionary<Guid, string> images = new Dictionary<Guid, string>();
 
     [Parameter]
@@ -83,8 +98,18 @@
         {
             SelectedComponents.AddRange(InitialSelection);
         }
-    
+
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (BtnRef != null)
+        {
+            await BtnRef.Value.FocusAsync();
+        }
+        
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private bool IsSelected(Component component) => SelectedComponents.Contains(component);

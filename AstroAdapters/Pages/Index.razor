@@ -27,7 +27,7 @@ else
                     <div class="@circleClass(SolverWizard.Target != null)">1</div>
                     <span>&nbsp;</span>
                     <div class="btn-wrapper">
-                        <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetTarget))" disabled="@(SolverWizard.Stage == SolutionStage.SetTarget)">
+                        <button tabindex="301" class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetTarget))" disabled="@(SolverWizard.Stage == SolutionStage.SetTarget)">
                             Set Target
                             @if (SolverWizard.Target != null)
                                 {
@@ -41,7 +41,7 @@ else
                     @if (SolverWizard.Target != null)
                         {
                         <div class="btn-wrapper">
-                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetSensor))" disabled="@(SolverWizard.Stage == SolutionStage.SetSensor)">
+                            <button tabindex="302" class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetSensor))" disabled="@(SolverWizard.Stage == SolutionStage.SetSensor)">
                                 Set Sensor
                                 @if (SolverWizard.Sensor != null)
                                     {
@@ -57,7 +57,7 @@ else
                     @if (SolverWizard.Sensor != null)
                         {
                         <div class="btn-wrapper">
-                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetConnectors))" disabled="@(SolverWizard.Stage == SolutionStage.SetConnectors)">
+                            <button tabindex="303" class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.SetConnectors))" disabled="@(SolverWizard.Stage == SolutionStage.SetConnectors)">
                                 Select Connectors
                                 @if (SolverWizard.SelectedConnectors.Any())
                                     {
@@ -72,7 +72,7 @@ else
                     @if (SolverWizard.SelectedConnectors.Count > 1)
                         {
                         <div class="btn-wrapper">
-                            <button class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.Ready))" disabled="@(SolverWizard.Stage == SolutionStage.Ready)">
+                            <button tabindex="304" class="btn btn-sm btn-primary" @onclick="@(()=>SolverWizard.SetStage(SolutionStage.Ready))" disabled="@(SolverWizard.Stage == SolutionStage.Ready)">
                                 <span class="oi oi-media-play"></span> Begin Solving
                             </button>
                         </div>

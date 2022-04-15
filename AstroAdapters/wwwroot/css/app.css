@@ -108,6 +108,18 @@ a, .btn-link {
     font-weight: bold;
 }
 
+.red {
+    background: coral;
+}
+
+.green {
+    background: lightgreen;
+}
+
+.blue {
+    background: lightblue;
+}
+
 .tight {
     margin: 1px;    
 }
