@@ -1,9 +1,8 @@
 ﻿using AstroAdapt.Models;
-using Microsoft.AspNetCore.Components;
 
 namespace AstroAdapters.Services
 {
-    public interface IDataServices : IAsyncDisposable
+    public interface IDataServices
     {
         Task<Preferences?> GetPreferencesAsync();
         Task SavePreferencesAsync(Preferences preferences);

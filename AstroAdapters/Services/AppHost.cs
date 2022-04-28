@@ -2,7 +2,7 @@
 
 namespace AstroAdapters.Services
 {
-    public sealed class AppHost : IAsyncDisposable, IAppHost
+    public sealed class AppHost : IAppHost
     {
         private readonly List<Manufacturer> manufacturers = new();
         private readonly IDataServices dataServices;
@@ -24,8 +24,7 @@ namespace AstroAdapters.Services
             get => busyCount > 0;
         }
 
-        public async ValueTask DisposeAsync() => await dataServices.DisposeAsync();
-
+        
         public void SetBusy()
         {
             busyCount++;

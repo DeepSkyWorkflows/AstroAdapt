@@ -39,9 +39,9 @@
                 <div class="label">Must not have type</div>
                 <div class="value red">
                     <select tabindex="103" @bind-value="@MustNotHaveType" @bind-value:event="oninput">
-                        @foreach(var type in componentTypes)
+                        @foreach(var type2 in componentTypes)
                         {
-                            <option value="@type">@type</option>
+                            <option value="@type2">@type2</option>
                         }
                     </select>
                 </div>
@@ -315,9 +315,9 @@
             {
                 query = query
                 .Where(s =>
-                    !s.Connections.Any(
+                    s.Connections.Any(
                         c =>
-                        c.ComponentType == mustHaveType));
+                        c.ComponentType == mustNotHaveType) == false);
             }
 
             if (mustHaveComponent != null)
@@ -333,9 +333,9 @@
             {
                 query = query
                 .Where(s =>
-                    !s.Connections.Any(
+                    s.Connections.Any(
                         c =>
-                        c.Id == mustNotHaveComponent));
+                        c.Id == mustNotHaveComponent) == false);
             }
 
             switch (sortBy)
@@ -377,14 +377,21 @@
         InvokeAsync(async () => await inpRef.FocusAsync());
     }
 
-    private async Task SaveAsync()
+    private async Task SaveAsync(bool innerLoop = false)
     {
-        savingSolution = true;
-        await DataServices.SaveSolutionAsync(objectToView!, description ?? objectToView!.ToString());
-        savingSolution = false;
-        solutionSaved = true;
-        Solutions!.Remove(objectToView!);
+        if (innerLoop)
+        {
+            savingSolution = true;
+            await DataServices.SaveSolutionAsync(objectToView!, description ?? objectToView!.ToString());
+            savingSolution = false;
+            solutionSaved = true;
+            Solutions!.Remove(objectToView!);
+        }
+        else
+        {
+            await InvokeAsync(async () => await SaveAsync(true));
+        }
     }
 
-    private void StartOver() => NavManager.NavigateTo(string.Empty, true);    
+    private void StartOver() => InvokeAsync(() => NavManager.NavigateTo(string.Empty, true));    
 }

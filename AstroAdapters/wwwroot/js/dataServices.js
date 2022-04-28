@@ -83,4 +83,12 @@ const getPreferences = async () => await retrieve(globals.preferences);
 const putPreferences = async (payload) => await save(globals.preferences, payload);
 const getSolutions = async () => await retrieve(globals.solutions);
 const putSolutions = async (payload) => await save(globals.solutions, payload);
-export { getManufacturers, getPreferences, putPreferences, resolveImage, getSolutions, putSolutions };
+
+window.dataServices = {
+    getManufacturers,
+    getPreferences,
+    putPreferences,
+    resolveImage,
+    getSolutions,
+    putSolutions
+};
